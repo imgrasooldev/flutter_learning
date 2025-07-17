@@ -15,6 +15,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailCtrl = TextEditingController();
   final passCtrl = TextEditingController();
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
@@ -22,43 +23,6 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(title: const Text("Login")),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        /* child: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is AuthSuccess) {
-              context.go('/home');
-            } else if (state is AuthFailure) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.err)));
-            }
-          },
-          builder: (context, state) {
-            return Column(
-              children: [
-                TextField(
-                  controller: emailCtrl,
-                  decoration: const InputDecoration(labelText: "Email"),
-                ),
-                TextField(
-                  controller: passCtrl,
-                  obscureText: true,
-                  decoration: const InputDecoration(labelText: "Password"),
-                ),
-                const SizedBox(height: 16),
-                state is AuthLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                      onPressed: () {
-                        context.read<AuthBloc>().add(
-                          LoginEvent(emailCtrl.text, passCtrl.text),
-                        );
-                      },
-                      child: const Text("Login"),
-                    ),
-              ],
-            );
-          },
-        ), */
         child: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is AuthSuccess) {
@@ -76,12 +40,35 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   TextField(
                     controller: emailCtrl,
-                    decoration: const InputDecoration(labelText: "Email"),
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.email),
+                        onPressed: () {},
+                      ),
+                    ),
                   ),
+                  SizedBox(height: 20),
                   TextField(
                     controller: passCtrl,
-                    obscureText: true,
-                    decoration: const InputDecoration(labelText: "Password"),
+                    obscureText: _obscureText,
+                    decoration: InputDecoration(
+                      labelText: "Password",
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   state is AuthLoading
