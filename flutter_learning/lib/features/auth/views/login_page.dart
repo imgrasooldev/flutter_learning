@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(title: const Text("Login")),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: BlocConsumer<AuthBloc, AuthState>(
+        /* child: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is AuthSuccess) {
               context.go('/home');
@@ -56,6 +56,52 @@ class _LoginPageState extends State<LoginPage> {
                       child: const Text("Login"),
                     ),
               ],
+            );
+          },
+        ), */
+        child: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthSuccess) {
+              context.go('/home');
+            } else if (state is AuthFailure) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.err)));
+            }
+          },
+          builder: (context, state) {
+            return SingleChildScrollView(
+              child: Column(
+                // crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextField(
+                    controller: emailCtrl,
+                    decoration: const InputDecoration(labelText: "Email"),
+                  ),
+                  TextField(
+                    controller: passCtrl,
+                    obscureText: true,
+                    decoration: const InputDecoration(labelText: "Password"),
+                  ),
+                  const SizedBox(height: 16),
+                  state is AuthLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton(
+                        onPressed: () {
+                          context.read<AuthBloc>().add(
+                            LoginEvent(emailCtrl.text, passCtrl.text),
+                          );
+                        },
+                        child: const Text("Login"),
+                      ),
+                  const SizedBox(height: 8),
+
+                  TextButton(
+                    onPressed: () => context.go('/register'),
+                    child: const Text("Don't have an account? Register Now"),
+                  ),
+                ],
+              ),
             );
           },
         ),

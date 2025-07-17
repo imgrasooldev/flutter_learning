@@ -34,6 +34,40 @@ class AuthRepository {
     }
   }
 
+  Future<UserModel> register({
+    required String name,
+    required String email,
+    required String password,
+    required String confirmPassword,
+  }) async {
+    try {
+      final res = await _api.post('register', {
+        'name': name,
+        'email': email,
+        'password': password,
+        'confirmPassword': confirmPassword,
+      });
+
+      if (res.data['success'] != true) {
+        throw Exception(res.data['message'] ?? 'Registration failed');
+      }
+
+      final data = res.data['data'];
+      final user = UserModel.fromJson(data);
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('token', user.token);
+      return user;
+    } on DioException catch (e) {
+      final statusCode = e.response?.statusCode;
+      final message =
+          e.response?.data['message'] ??
+          'Registration failed (HTTP $statusCode)';
+      throw message.toString();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
