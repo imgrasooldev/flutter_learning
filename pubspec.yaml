@@ -23,3 +23,14 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/icons/google.png
+    - assets/icons/fb.png
+    - assets/icons/apple.png
+    - assets/images/pavlovvisuals.png
+  fonts:
+    - family: WorkSans
+      fonts:
+        - asset: assets/fonts/WorkSans/WorkSans-Regular.ttf
+        - asset: assets/fonts/WorkSans/WorkSans-Bold.ttf
+          weight: 700
