@@ -28,7 +28,15 @@ class MyApp extends StatelessWidget {
         ],
         child: MaterialApp.router(
           title: 'Flutter BLoC App',
-          theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+          theme: ThemeData(
+            primarySwatch: Colors.teal,
+            scaffoldBackgroundColor: const Color(0xFFF9F9F9),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              elevation: 1,
+            ),
+          ),
           routerConfig: AppRouter.router,
           debugShowCheckedModeBanner: false,
         ),
