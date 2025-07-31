@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learning/features/seeker/views/provider_detail_page.dart';
 import 'package:go_router/go_router.dart';
 import '../../../theme/app_colors.dart';
 
@@ -264,6 +265,19 @@ class _HomePageState extends State<HomePage> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
+        onTap: () {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => ProviderDetailPage(
+        name: name,
+        area: area,
+        rating: rating,
+        online: online,
+      ),
+    ),
+  );
+},
         leading: Stack(
           children: [
             const CircleAvatar(child: Icon(Icons.person)),
