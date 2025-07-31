@@ -1,10 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
-import 'package:go_router/go_router.dart';
+import '../../../theme/app_colors.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,224 +23,205 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0ECF3),
+      backgroundColor: AppColors.background,
       body: SafeArea(
-        // ✅ Prevents UI from being cut off by notches or system UI
-        child: LayoutBuilder(
-          // ✅ Adapts layout to screen size
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight:
-                      constraints
-                          .maxHeight, // ✅ Makes sure content takes full height
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: BlocConsumer<AuthBloc, AuthState>(
-                    listener: (context, state) {
-                      if (state is AuthSuccess) {
-                        context.go('/home');
-                      } else if (state is AuthFailure) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text(state.err)));
-                      }
-                    },
-                    builder: (context, state) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 35),
-                          const Text(
-                            "Sign in",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'WorkSans',
-                              fontSize: 26.16,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          RichText(
-                            text: TextSpan(
-                              text: 'New User? ',
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 15.7,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: 'Create an account',
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  recognizer:
-                                      TapGestureRecognizer()
-                                        ..onTap = () {
-                                          context.go('/register');
-                                        },
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          TextField(
-                            controller: emailCtrl,
-                            decoration: const InputDecoration(
-                              labelText: 'Email address',
-                              labelStyle: TextStyle(
-                                fontFamily: 'WorkSans',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              suffixIcon: Icon(Icons.email),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          TextField(
-                            controller: passCtrl,
-                            obscureText: _obscureText,
-                            decoration: InputDecoration(
-                              labelText: "Password",
-                              labelStyle: const TextStyle(
-                                fontFamily: 'WorkSans',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                              enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscureText
-                                      ? Icons.visibility_off
-                                      : Icons.visibility,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureText = !_obscureText;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          if (state is AuthLoading)
-                            const Center(child: CircularProgressIndicator())
-                          else
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  context.read<AuthBloc>().add(
-                                    LoginEvent(emailCtrl.text, passCtrl.text),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  side: const BorderSide(
-                                    color: Colors.black,
-                                    width: 2,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  backgroundColor: Colors.black,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 30,
-                                    vertical: 15,
-                                  ),
-                                ),
-                                child: const Text(
-                                  "Continue",
-                                  style: TextStyle(fontSize: 15),
-                                ),
-                              ),
-                            ),
-                          const SizedBox(height: 15),
-                          const Row(
-                            children: [
-                              Expanded(
-                                child: Divider(
-                                  color: Colors.grey,
-                                  thickness: 1,
-                                  endIndent: 10,
-                                ),
-                              ),
-                              Text(
-                                "or",
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontFamily: 'WorkSans',
-                                  fontSize: 13.08,
-                                ),
-                              ),
-                              Expanded(
-                                child: Divider(
-                                  color: Colors.grey,
-                                  thickness: 1,
-                                  indent: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 15),
-
-                          // ✅ Social Buttons
-                          _buildSocialButton(
-                            onPressed: () {},
-                            iconPath: 'assets/icons/google.png',
-                            label: 'Continue with Google',
-                          ),
-                          const SizedBox(height: 15),
-                          _buildSocialButton(
-                            onPressed: () {},
-                            iconPath: 'assets/icons/fb.png',
-                            label: 'Continue with Facebook',
-                          ),
-                          const SizedBox(height: 15),
-                          _buildSocialButton(
-                            onPressed: () {},
-                            iconPath: 'assets/icons/apple.png',
-                            label: 'Continue with Apple',
-                          ),
-                          const SizedBox(height: 20),
-
-                          // ✅ Image at bottom
-                          Center(
-                            child: Image.asset(
-                              'assets/images/pavlovvisuals.png',
-                              fit: BoxFit.contain,
-                              width:
-                                  MediaQuery.of(context).size.width *
-                                  0.7, // ✅ Responsive width
-                            ),
-                          ),
-                        ],
-                      );
-                    },
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: BlocConsumer<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is AuthSuccess) {
+                context.go('/home');
+              } else if (state is AuthFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.err)),
+                );
+              }
+            },
+            builder: (context, state) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 40),
+                  const Text(
+                    "Welcome Back 👋",
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
                   ),
-                ),
-              ),
-            );
-          },
+                  const SizedBox(height: 8),
+                  RichText(
+                    text: TextSpan(
+                      text: 'New here? ',
+                      style: const TextStyle(
+                        fontSize: 15.5,
+                        color: AppColors.textPrimary,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: 'Create an account',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () => context.go('/register'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  _buildTextField(
+                    controller: emailCtrl,
+                    label: 'Email address',
+                    icon: Icons.email,
+                  ),
+                  const SizedBox(height: 20),
+
+                  _buildTextField(
+                    controller: passCtrl,
+                    label: 'Password',
+                    icon: Icons.lock,
+                    obscure: _obscureText,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureText
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: AppColors.textMuted,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+
+                  if (state is AuthLoading)
+                    const Center(child: CircularProgressIndicator())
+                  else
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          context.read<AuthBloc>().add(
+                                LoginEvent(
+                                  emailCtrl.text.trim(),
+                                  passCtrl.text.trim(),
+                                ),
+                              );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryDark,
+                          foregroundColor: AppColors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text(
+                          "Sign in",
+                          style: TextStyle(fontSize: 17),
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 30),
+
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          thickness: 1,
+                          endIndent: 10,
+                          color: AppColors.divider,
+                        ),
+                      ),
+                      Text(
+                        "or",
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(
+                          thickness: 1,
+                          indent: 10,
+                          color: AppColors.divider,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 26),
+
+                  _buildSocialButton(
+                    onPressed: () {},
+                    iconPath: 'assets/icons/google.png',
+                    label: 'Continue with Google',
+                  ),
+                  const SizedBox(height: 14),
+                  _buildSocialButton(
+                    onPressed: () {},
+                    iconPath: 'assets/icons/fb.png',
+                    label: 'Continue with Facebook',
+                  ),
+                  const SizedBox(height: 14),
+                  _buildSocialButton(
+                    onPressed: () {},
+                    iconPath: 'assets/icons/apple.png',
+                    label: 'Continue with Apple',
+                  ),
+                  const SizedBox(height: 10),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
   }
 
-  // ✅ Extracted Social Button Builder for cleaner code
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool obscure = false,
+    Widget? suffixIcon,
+  }) {
+    return Material(
+      elevation: 1.5,
+      shadowColor: Colors.black12,
+      borderRadius: BorderRadius.circular(14),
+      child: TextField(
+        controller: controller,
+        obscureText: obscure,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(
+            color: AppColors.primary,
+            fontWeight: FontWeight.w500,
+          ),
+          prefixIcon: Icon(icon, color: AppColors.primary),
+          suffixIcon: suffixIcon,
+          filled: true,
+          fillColor: AppColors.fieldFill,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSocialButton({
     required VoidCallback onPressed,
     required String iconPath,
@@ -246,25 +229,26 @@ class _LoginPageState extends State<LoginPage> {
   }) {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton.icon(
+      child: OutlinedButton.icon(
         onPressed: onPressed,
         icon: Image.asset(iconPath, height: 24, width: 24),
-        label: Text(
-          label,
-          style: const TextStyle(
-            fontFamily: 'WorkSans',
-            fontSize: 15.19,
-            fontWeight: FontWeight.w600,
-            color: Color.fromARGB(255, 65, 65, 65),
+        label: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 15,
+              color: AppColors.socialText,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.white,
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: AppColors.divider),
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         ),
       ),
     );

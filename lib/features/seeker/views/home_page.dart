@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../theme/app_colors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,43 +13,16 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _allServices = [
-    'Electrician',
-    'Plumber',
-    'Mechanic',
-    'Tutor',
-    'Cleaner',
-    'Tailor',
-    'Painter',
-    'Driver',
-    'AC Repair',
-    "Bike Mechanic",
-    "Car Mechanic",
-    "Car AC Mechanic",
-    "Teacher",
-    "Religious Teacher",
-    "Math Teacher",
+    'Electrician', 'Plumber', 'Mechanic', 'Tutor', 'Cleaner',
+    'Tailor', 'Painter', 'Driver', 'AC Repair', "Bike Mechanic",
+    "Car Mechanic", "Car AC Mechanic", "Teacher", "Religious Teacher", "Math Teacher",
   ];
 
   final List<Map<String, dynamic>> _providers = [
-    {
-      'name': 'Ali Electrician',
-      'area': 'Gulshan-e-Maymar',
-      'rating': 4.9,
-      'online': true,
-    },
+    {'name': 'Ali Electrician', 'area': 'Gulshan-e-Maymar', 'rating': 4.9, 'online': true},
     {'name': 'Zara Tutor', 'area': 'Nazimabad', 'rating': 4.8, 'online': true},
-    {
-      'name': 'Asif Mechanic',
-      'area': 'Ahsanabad',
-      'rating': 4.7,
-      'online': false,
-    },
-    {
-      'name': 'Qasim Plumber',
-      'area': 'Gulistan-e-Johar',
-      'rating': 4.6,
-      'online': true,
-    },
+    {'name': 'Asif Mechanic', 'area': 'Ahsanabad', 'rating': 4.7, 'online': false},
+    {'name': 'Qasim Plumber', 'area': 'Gulistan-e-Johar', 'rating': 4.6, 'online': true},
   ];
 
   List<String> _filteredServices = [];
@@ -59,8 +33,9 @@ class _HomePageState extends State<HomePage> {
     _searchController.addListener(() {
       final query = _searchController.text.toLowerCase();
       setState(() {
-        _filteredServices =
-            _allServices.where((s) => s.toLowerCase().contains(query)).toList();
+        _filteredServices = _allServices
+            .where((s) => s.toLowerCase().contains(query))
+            .toList();
       });
     });
   }
@@ -70,26 +45,26 @@ class _HomePageState extends State<HomePage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6F9),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 1.5,
         leading: const Padding(
           padding: EdgeInsets.all(8.0),
-          child: Icon(Icons.home_repair_service, color: Colors.teal),
+          child: Icon(Icons.home_repair_service, color: AppColors.primary),
         ),
         title: const Text(
           'Kaam',
-          style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold),
+          style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.location_on, color: Colors.teal),
+            icon: const Icon(Icons.location_on, color: AppColors.primary),
           ),
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.person, color: Colors.teal),
+            icon: const Icon(Icons.person, color: AppColors.primary),
           ),
         ],
       ),
@@ -100,7 +75,7 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Search
+                // Search Box
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -113,15 +88,10 @@ class _HomePageState extends State<HomePage> {
                           controller: _searchController,
                           decoration: InputDecoration(
                             hintText: 'Search for electrician, plumber...',
-                            prefixIcon: const Icon(
-                              Icons.search,
-                              color: Colors.teal,
-                            ),
+                            prefixIcon: const Icon(Icons.search, color: AppColors.primary),
                             filled: true,
-                            fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 14,
-                            ),
+                            fillColor: AppColors.fieldFill,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 14),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -134,13 +104,13 @@ class _HomePageState extends State<HomePage> {
                           margin: const EdgeInsets.only(top: 8),
                           constraints: const BoxConstraints(maxHeight: 200),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black12,
                                 blurRadius: 5,
-                                offset: Offset(0, 3),
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),
@@ -151,8 +121,7 @@ class _HomePageState extends State<HomePage> {
                               return ListTile(
                                 title: Text(_filteredServices[index]),
                                 onTap: () {
-                                  _searchController.text =
-                                      _filteredServices[index];
+                                  _searchController.text = _filteredServices[index];
                                   setState(() => _filteredServices.clear());
                                 },
                               );
@@ -163,6 +132,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
+                // Services Header
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
@@ -170,11 +140,12 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.teal,
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
 
+                // Services Grid
                 LayoutBuilder(
                   builder: (context, constraints) {
                     int crossAxisCount = screenWidth > 600 ? 4 : 3;
@@ -197,6 +168,7 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
 
+                // Providers Header
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
@@ -204,11 +176,12 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.teal,
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
 
+                // Providers List
                 ListView.builder(
                   itemCount: _providers.length,
                   shrinkWrap: true,
@@ -229,23 +202,18 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // Sticky CTA
+          // Sticky CTA Button
           Positioned(
             left: 16,
             right: 16,
             bottom: 16,
             child: ElevatedButton.icon(
-              onPressed: () {
-                context.go('/provider_home');
-              },
-              icon: const Icon(Icons.handyman, color: Colors.white),
-              label: const Text(
-                'Offer your service',
-                style: TextStyle(color: Colors.white),
-              ),
+              onPressed: () => context.go('/provider_home'),
+              icon: const Icon(Icons.handyman, color: AppColors.white),
+              label: const Text('Offer your service', style: TextStyle(color: AppColors.white)),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 52),
-                backgroundColor: Colors.teal.shade600,
+                backgroundColor: AppColors.primaryDark,
                 elevation: 3,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(28),
@@ -263,7 +231,7 @@ class _HomePageState extends State<HomePage> {
       onTap: () => debugPrint("Clicked: $title"),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
@@ -277,7 +245,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 34, color: Colors.teal.shade600),
+            Icon(icon, size: 34, color: AppColors.primaryDark),
             const SizedBox(height: 8),
             Text(
               title,
