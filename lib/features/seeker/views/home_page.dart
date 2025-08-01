@@ -14,16 +14,43 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _allServices = [
-    'Electrician', 'Plumber', 'Mechanic', 'Tutor', 'Cleaner',
-    'Tailor', 'Painter', 'Driver', 'AC Repair', "Bike Mechanic",
-    "Car Mechanic", "Car AC Mechanic", "Teacher", "Religious Teacher", "Math Teacher",
+    'Electrician',
+    'Plumber',
+    'Mechanic',
+    'Tutor',
+    'Cleaner',
+    'Tailor',
+    'Painter',
+    'Driver',
+    'AC Repair',
+    "Bike Mechanic",
+    "Car Mechanic",
+    "Car AC Mechanic",
+    "Teacher",
+    "Religious Teacher",
+    "Math Teacher",
   ];
 
   final List<Map<String, dynamic>> _providers = [
-    {'name': 'Ali Electrician', 'area': 'Gulshan-e-Maymar', 'rating': 4.9, 'online': true},
+    {
+      'name': 'Ali Electrician',
+      'area': 'Gulshan-e-Maymar',
+      'rating': 4.9,
+      'online': true,
+    },
     {'name': 'Zara Tutor', 'area': 'Nazimabad', 'rating': 4.8, 'online': true},
-    {'name': 'Asif Mechanic', 'area': 'Ahsanabad', 'rating': 4.7, 'online': false},
-    {'name': 'Qasim Plumber', 'area': 'Gulistan-e-Johar', 'rating': 4.6, 'online': true},
+    {
+      'name': 'Asif Mechanic',
+      'area': 'Ahsanabad',
+      'rating': 4.7,
+      'online': false,
+    },
+    {
+      'name': 'Qasim Plumber',
+      'area': 'Gulistan-e-Johar',
+      'rating': 4.6,
+      'online': true,
+    },
   ];
 
   List<String> _filteredServices = [];
@@ -34,9 +61,8 @@ class _HomePageState extends State<HomePage> {
     _searchController.addListener(() {
       final query = _searchController.text.toLowerCase();
       setState(() {
-        _filteredServices = _allServices
-            .where((s) => s.toLowerCase().contains(query))
-            .toList();
+        _filteredServices =
+            _allServices.where((s) => s.toLowerCase().contains(query)).toList();
       });
     });
   }
@@ -66,7 +92,10 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.location_on_outlined, color: AppColors.primary),
+            icon: const Icon(
+              Icons.location_on_outlined,
+              color: AppColors.primary,
+            ),
           ),
           IconButton(
             onPressed: () => context.push('/profile'),
@@ -89,7 +118,10 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     // Search
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 16),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
+                        vertical: 16,
+                      ),
                       child: Column(
                         children: [
                           Material(
@@ -99,20 +131,32 @@ class _HomePageState extends State<HomePage> {
                             child: TextField(
                               controller: _searchController,
                               decoration: InputDecoration(
-                                hintText: 'Search services e.g., plumber, tutor...',
-                                prefixIcon: const Icon(Icons.search, color: AppColors.primary),
-                                suffixIcon: _searchController.text.isNotEmpty
-                                    ? IconButton(
-                                        icon: const Icon(Icons.clear, color: AppColors.primary),
-                                        onPressed: () {
-                                          _searchController.clear();
-                                          setState(() => _filteredServices.clear());
-                                        },
-                                      )
-                                    : null,
+                                hintText:
+                                    'Search services e.g., plumber, tutor...',
+                                prefixIcon: const Icon(
+                                  Icons.search,
+                                  color: AppColors.primary,
+                                ),
+                                suffixIcon:
+                                    _searchController.text.isNotEmpty
+                                        ? IconButton(
+                                          icon: const Icon(
+                                            Icons.clear,
+                                            color: AppColors.primary,
+                                          ),
+                                          onPressed: () {
+                                            _searchController.clear();
+                                            setState(
+                                              () => _filteredServices.clear(),
+                                            );
+                                          },
+                                        )
+                                        : null,
                                 filled: true,
                                 fillColor: AppColors.fieldFill,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide.none,
@@ -123,6 +167,9 @@ class _HomePageState extends State<HomePage> {
                           if (_filteredServices.isNotEmpty)
                             Container(
                               margin: const EdgeInsets.only(top: 8),
+                              constraints: const BoxConstraints(
+                                maxHeight: 200,
+                              ), // Limit max height
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
@@ -135,13 +182,13 @@ class _HomePageState extends State<HomePage> {
                                 ],
                               ),
                               child: ListView.builder(
-                                shrinkWrap: true,
                                 itemCount: _filteredServices.length,
                                 itemBuilder: (context, index) {
                                   return ListTile(
                                     title: Text(_filteredServices[index]),
                                     onTap: () {
-                                      _searchController.text = _filteredServices[index];
+                                      _searchController.text =
+                                          _filteredServices[index];
                                       setState(() => _filteredServices.clear());
                                     },
                                   );
@@ -153,7 +200,9 @@ class _HomePageState extends State<HomePage> {
                     ),
 
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
+                      ),
                       child: const Text(
                         'Popular Services',
                         style: TextStyle(
@@ -185,7 +234,9 @@ class _HomePageState extends State<HomePage> {
                     ),
 
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
+                      ),
                       child: const Text(
                         'Top Providers Near You',
                         style: TextStyle(
@@ -222,8 +273,14 @@ class _HomePageState extends State<HomePage> {
                 bottom: 16,
                 child: ElevatedButton.icon(
                   onPressed: () => context.go('/provider_home'),
-                  icon: const Icon(Icons.handyman_outlined, color: Colors.white),
-                  label: const Text('Offer your service', style: TextStyle(color: Colors.white)),
+                  icon: const Icon(
+                    Icons.handyman_outlined,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    'Offer your service',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
                     backgroundColor: AppColors.primaryDark,
@@ -265,7 +322,10 @@ class _HomePageState extends State<HomePage> {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -283,12 +343,13 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => ProviderDetailPage(
-                name: name,
-                area: area,
-                rating: rating,
-                online: online,
-              ),
+              builder:
+                  (_) => ProviderDetailPage(
+                    name: name,
+                    area: area,
+                    rating: rating,
+                    online: online,
+                  ),
             ),
           );
         },
@@ -308,10 +369,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        title: Text(
-          name,
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
+        title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: Text('$area • ${online ? 'Online' : 'Offline'}'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
