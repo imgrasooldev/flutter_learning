@@ -74,164 +74,169 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 80),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Search
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Material(
-                        elevation: 3,
-                        borderRadius: BorderRadius.circular(12),
-                        shadowColor: Colors.black12,
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                            hintText: 'Search services e.g., plumber, tutor...',
-                            prefixIcon: const Icon(Icons.search, color: AppColors.primary),
-                            suffixIcon: _searchController.text.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(Icons.clear, color: AppColors.primary),
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      setState(() => _filteredServices.clear());
-                                    },
-                                  )
-                                : null,
-                            filled: true,
-                            fillColor: AppColors.fieldFill,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth > 800;
+          final crossAxisCount = isWide ? 5 : (screenWidth > 600 ? 4 : 3);
+          final horizontalPadding = screenWidth > 768 ? 32.0 : 16.0;
+
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 80),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Search
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 16),
+                      child: Column(
+                        children: [
+                          Material(
+                            elevation: 3,
+                            borderRadius: BorderRadius.circular(12),
+                            shadowColor: Colors.black12,
+                            child: TextField(
+                              controller: _searchController,
+                              decoration: InputDecoration(
+                                hintText: 'Search services e.g., plumber, tutor...',
+                                prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                                suffixIcon: _searchController.text.isNotEmpty
+                                    ? IconButton(
+                                        icon: const Icon(Icons.clear, color: AppColors.primary),
+                                        onPressed: () {
+                                          _searchController.clear();
+                                          setState(() => _filteredServices.clear());
+                                        },
+                                      )
+                                    : null,
+                                filled: true,
+                                fillColor: AppColors.fieldFill,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
                             ),
                           ),
+                          if (_filteredServices.isNotEmpty)
+                            Container(
+                              margin: const EdgeInsets.only(top: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: _filteredServices.length,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    title: Text(_filteredServices[index]),
+                                    onTap: () {
+                                      _searchController.text = _filteredServices[index];
+                                      setState(() => _filteredServices.clear());
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                      child: const Text(
+                        'Popular Services',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
                         ),
                       ),
-                      if (_filteredServices.isNotEmpty)
-                        Container(
-                          margin: const EdgeInsets.only(top: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 4,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: _filteredServices.length,
-                            itemBuilder: (context, index) {
-                              return ListTile(
-                                title: Text(_filteredServices[index]),
-                                onTap: () {
-                                  _searchController.text = _filteredServices[index];
-                                  setState(() => _filteredServices.clear());
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
-                  child: Text(
-                    'Popular Services',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
                     ),
-                  ),
-                ),
 
-                // Services Grid
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    int crossAxisCount = screenWidth > 600 ? 4 : 3;
-                    return GridView.count(
-                      crossAxisCount: crossAxisCount,
+                    Padding(
+                      padding: EdgeInsets.all(horizontalPadding),
+                      child: GridView.count(
+                        crossAxisCount: crossAxisCount,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        mainAxisSpacing: 14,
+                        crossAxisSpacing: 14,
+                        childAspectRatio: 1,
+                        children: [
+                          serviceTile('Electrician', Icons.electrical_services),
+                          serviceTile('Plumber', Icons.plumbing),
+                          serviceTile('Mechanic', Icons.build),
+                          serviceTile('Tutor', Icons.school),
+                          serviceTile('Cleaner', Icons.cleaning_services),
+                          serviceTile('Tailor', Icons.checkroom),
+                        ],
+                      ),
+                    ),
+
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                      child: const Text(
+                        'Top Providers Near You',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+
+                    ListView.builder(
+                      itemCount: _providers.length,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(16),
-                      mainAxisSpacing: 14,
-                      crossAxisSpacing: 14,
-                      children: [
-                        serviceTile('Electrician', Icons.electrical_services),
-                        serviceTile('Plumber', Icons.plumbing),
-                        serviceTile('Mechanic', Icons.build),
-                        serviceTile('Tutor', Icons.school),
-                        serviceTile('Cleaner', Icons.cleaning_services),
-                        serviceTile('Tailor', Icons.checkroom),
-                      ],
-                    );
-                  },
-                ),
-
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    'Top Providers Near You',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
+                      itemBuilder: (context, index) {
+                        final p = _providers[index];
+                        return providerCard(
+                          p['name'],
+                          p['area'],
+                          p['rating'],
+                          p['online'] ?? false,
+                        );
+                      },
                     ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+
+              // Sticky CTA
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: 16,
+                child: ElevatedButton.icon(
+                  onPressed: () => context.go('/provider_home'),
+                  icon: const Icon(Icons.handyman_outlined, color: Colors.white),
+                  label: const Text('Offer your service', style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                    backgroundColor: AppColors.primaryDark,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(26),
+                    ),
+                    elevation: 4,
                   ),
                 ),
-
-                ListView.builder(
-                  itemCount: _providers.length,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    final p = _providers[index];
-                    return providerCard(
-                      p['name'],
-                      p['area'],
-                      p['rating'],
-                      p['online'] ?? false,
-                    );
-                  },
-                ),
-                const SizedBox(height: 30),
-              ],
-            ),
-          ),
-
-          // Sticky CTA
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 16,
-            child: ElevatedButton.icon(
-              onPressed: () => context.go('/provider_home'),
-              icon: const Icon(Icons.handyman_outlined, color: Colors.white),
-              label: const Text('Offer your service', style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-                backgroundColor: AppColors.primaryDark,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(26),
-                ),
-                elevation: 4,
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
@@ -270,8 +275,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget providerCard(String name, String area, double rating, bool online) {
     return Card(
-      color: Colors.white, // 👈 Add this line
-      elevation: 1.8,
+      color: Colors.white,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
