@@ -28,6 +28,8 @@ flutter:
     - assets/icons/fb.png
     - assets/icons/apple.png
     - assets/images/pavlovvisuals.png
+    - assets/images/profile_image.jpg
+    - assets/images/profile_image2.jpg
   fonts:
     - family: WorkSans
       fonts:

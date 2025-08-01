@@ -63,6 +63,10 @@ class _ProfilePageState extends State<ProfilePage> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
+            leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
             expandedHeight: 320,
             pinned: true,
             backgroundColor: AppColors.primary,
@@ -102,7 +106,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               tag: 'profile_pic',
                               child: CircleAvatar(
                                 radius: 52,
-                                backgroundImage: AssetImage('assets/user_dummy.png'),
+                                backgroundImage: AssetImage('assets/images/profile_image.jpg'),
                               ),
                             ),
                             Positioned(
