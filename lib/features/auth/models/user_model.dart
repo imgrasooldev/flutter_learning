@@ -24,6 +24,11 @@ class UserModel {
       );
     }
   }
+  
+  Map<String, dynamic> toJson() {
+    return {'name': name, 'email': email, 'token': token};
+  }
+  
 }
 
 /* class UserModel {

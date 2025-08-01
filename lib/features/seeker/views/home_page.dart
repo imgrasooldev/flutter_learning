@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
             icon: const Icon(Icons.location_on, color: AppColors.primary),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () => context.push('/profile'),
             icon: const Icon(Icons.person, color: AppColors.primary),
           ),
         ],
@@ -266,18 +266,18 @@ class _HomePageState extends State<HomePage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         onTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => ProviderDetailPage(
-        name: name,
-        area: area,
-        rating: rating,
-        online: online,
-      ),
-    ),
-  );
-},
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ProviderDetailPage(
+                name: name,
+                area: area,
+                rating: rating,
+                online: online,
+              ),
+            ),
+          );
+        },
         leading: Stack(
           children: [
             const CircleAvatar(child: Icon(Icons.person)),

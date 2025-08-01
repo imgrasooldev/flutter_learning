@@ -2,6 +2,9 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter_learning/features/auth/repository/auth_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_learning/features/auth/models/user_model.dart';
+
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
@@ -35,5 +38,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await authRepository.logout();
       emit(AuthInitial());
     });
+
+    on<AppStarted>((event, emit) async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+
+  if (token != null && token.isNotEmpty) {
+    // Manually build the user (or call /profile from backend if available)
+    final user = UserModel(name: "Unknown", email: "unknown", token: token);
+    emit(AuthSuccess(user));
+  } else {
+    emit(AuthInitial());
+  }
+});
+
   }
 }
