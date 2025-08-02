@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_learning/features/seeker/bloc/category_bloc.dart';
+import 'package:flutter_learning/features/seeker/bloc/category_event.dart';
+import 'package:flutter_learning/features/seeker/bloc/category_state.dart';
+import 'package:flutter_learning/features/seeker/models/category_model.dart';
 import 'package:flutter_learning/features/seeker/views/provider_detail_page.dart';
+import 'package:flutter_learning/features/seeker/views/components/search_bar.dart';
 import 'package:go_router/go_router.dart';
 import '../../../theme/app_colors.dart';
 
@@ -13,22 +19,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
 
-  final List<String> _allServices = [
-    'Electrician',
-    'Plumber',
-    'Mechanic',
-    'Tutor',
-    'Cleaner',
-    'Tailor',
-    'Painter',
-    'Driver',
-    'AC Repair',
-    "Bike Mechanic",
-    "Car Mechanic",
-    "Car AC Mechanic",
-    "Teacher",
-    "Religious Teacher",
-    "Math Teacher",
+  List<CategoryModel> _allServices = [];
+  List<CategoryModel> _filteredServices = [];
+
+  final List<Map<String, dynamic>> _popularServices = [
+    {'title': 'Electrician', 'icon': Icons.electrical_services},
+    {'title': 'Plumber', 'icon': Icons.plumbing},
+    {'title': 'Mechanic', 'icon': Icons.build},
+    {'title': 'Tutor', 'icon': Icons.school},
+    {'title': 'Cleaner', 'icon': Icons.cleaning_services},
+    {'title': 'Tailor', 'icon': Icons.checkroom},
   ];
 
   final List<Map<String, dynamic>> _providers = [
@@ -53,247 +53,209 @@ class _HomePageState extends State<HomePage> {
     },
   ];
 
-  List<String> _filteredServices = [];
-
   @override
   void initState() {
     super.initState();
+    // Dispatch FetchCategories event once when page loads
+    context.read<CategoryBloc>().add(FetchCategories());
+
     _searchController.addListener(() {
       final query = _searchController.text.toLowerCase();
       setState(() {
         _filteredServices =
-            _allServices.where((s) => s.toLowerCase().contains(query)).toList();
+            _allServices
+                .where((s) => s.name.toLowerCase().contains(query))
+                .toList();
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 1,
-        centerTitle: true,
-        leading: const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Icon(Icons.home_repair_service, color: AppColors.primary),
+      appBar: buildAppBar(context),
+      body: BlocBuilder<CategoryBloc, CategoryState>(
+        builder: (context, state) {
+          if (state is CategoryLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is CategoryLoaded) {
+            _allServices = state.categories;
+            return buildContent(context);
+          } else if (state is CategoryError) {
+            return Center(child: Text('Error: ${state.message}'));
+          }
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+  }
+
+  AppBar buildAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: AppColors.white,
+      elevation: 1,
+      centerTitle: true,
+      leading: const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Icon(Icons.home_repair_service, color: AppColors.primary),
+      ),
+      title: const Text(
+        'Kaam',
+        style: TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w700,
+          fontSize: 20,
         ),
-        title: const Text(
-          'Kaam',
-          style: TextStyle(
+      ),
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(
+            Icons.location_on_outlined,
             color: AppColors.primary,
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.location_on_outlined,
+        IconButton(
+          onPressed: () => context.push('/profile'),
+          icon: const Icon(Icons.person_outline, color: AppColors.primary),
+        ),
+      ],
+    );
+  }
+
+  Widget buildContent(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final crossAxisCount =
+        screenWidth > 800
+            ? 5
+            : (screenWidth > 600
+                ? 4
+                : 3); // Adjust grid count based on screen width
+    final horizontalPadding = screenWidth > 768 ? 32.0 : 16.0;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 80),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SearchBarWidget(
+                    controller: _searchController,
+                    filteredServices: _filteredServices,
+                    onSelect: (service) {
+                      _searchController.text = service.name;
+                      setState(() => _filteredServices.clear());
+                    },
+                  ),
+                  buildPopularServicesGrid(crossAxisCount, horizontalPadding),
+                  buildTopProvidersSection(horizontalPadding),
+                ],
+              ),
+            ),
+            buildCTAButton(),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget buildPopularServicesGrid(
+    int crossAxisCount,
+    double horizontalPadding,
+  ) {
+    return Padding(
+      padding: EdgeInsets.all(horizontalPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Popular Services',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
               color: AppColors.primary,
             ),
           ),
-          IconButton(
-            onPressed: () => context.push('/profile'),
-            icon: const Icon(Icons.person_outline, color: AppColors.primary),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 14,
+            runSpacing: 14,
+            children:
+                _popularServices.map((service) {
+                  final width =
+                      (MediaQuery.of(context).size.width -
+                          (crossAxisCount - 1) * 14 -
+                          32) /
+                      crossAxisCount;
+                  return SizedBox(
+                    width: width,
+                    child: serviceTile(service['title'], service['icon']),
+                  );
+                }).toList(),
           ),
         ],
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final isWide = constraints.maxWidth > 800;
-          final crossAxisCount = isWide ? 5 : (screenWidth > 600 ? 4 : 3);
-          final horizontalPadding = screenWidth > 768 ? 32.0 : 16.0;
+    );
+  }
 
-          return Stack(
-            children: [
-              SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 80),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Search
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding,
-                        vertical: 16,
-                      ),
-                      child: Column(
-                        children: [
-                          Material(
-                            elevation: 3,
-                            borderRadius: BorderRadius.circular(12),
-                            shadowColor: Colors.black12,
-                            child: TextField(
-                              controller: _searchController,
-                              decoration: InputDecoration(
-                                hintText:
-                                    'Search services e.g., plumber, tutor...',
-                                prefixIcon: const Icon(
-                                  Icons.search,
-                                  color: AppColors.primary,
-                                ),
-                                suffixIcon:
-                                    _searchController.text.isNotEmpty
-                                        ? IconButton(
-                                          icon: const Icon(
-                                            Icons.clear,
-                                            color: AppColors.primary,
-                                          ),
-                                          onPressed: () {
-                                            _searchController.clear();
-                                            setState(
-                                              () => _filteredServices.clear(),
-                                            );
-                                          },
-                                        )
-                                        : null,
-                                filled: true,
-                                fillColor: AppColors.fieldFill,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (_filteredServices.isNotEmpty)
-                            Container(
-                              margin: const EdgeInsets.only(top: 8),
-                              constraints: const BoxConstraints(
-                                maxHeight: 200,
-                              ), // Limit max height
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 4,
-                                    offset: Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: ListView.builder(
-                                itemCount: _filteredServices.length,
-                                itemBuilder: (context, index) {
-                                  return ListTile(
-                                    title: Text(_filteredServices[index]),
-                                    onTap: () {
-                                      _searchController.text =
-                                          _filteredServices[index];
-                                      setState(() => _filteredServices.clear());
-                                    },
-                                  );
-                                },
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+  Widget buildTopProvidersSection(double horizontalPadding) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Top Providers Near You',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+            ),
+          ),
+          ListView.builder(
+            itemCount: _providers.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              final p = _providers[index];
+              return providerCard(
+                p['name'],
+                p['area'],
+                p['rating'],
+                p['online'] ?? false,
+              );
+            },
+          ),
+          const SizedBox(height: 30),
+        ],
+      ),
+    );
+  }
 
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding,
-                      ),
-                      child: const Text(
-                        'Popular Services',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
-
-                    Padding(
-                      padding: EdgeInsets.all(horizontalPadding),
-                      child: GridView.count(
-                        crossAxisCount: crossAxisCount,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        mainAxisSpacing: 14,
-                        crossAxisSpacing: 14,
-                        childAspectRatio: 1,
-                        children: [
-                          serviceTile('Electrician', Icons.electrical_services),
-                          serviceTile('Plumber', Icons.plumbing),
-                          serviceTile('Mechanic', Icons.build),
-                          serviceTile('Tutor', Icons.school),
-                          serviceTile('Cleaner', Icons.cleaning_services),
-                          serviceTile('Tailor', Icons.checkroom),
-                        ],
-                      ),
-                    ),
-
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding,
-                      ),
-                      child: const Text(
-                        'Top Providers Near You',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
-
-                    ListView.builder(
-                      itemCount: _providers.length,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        final p = _providers[index];
-                        return providerCard(
-                          p['name'],
-                          p['area'],
-                          p['rating'],
-                          p['online'] ?? false,
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 30),
-                  ],
-                ),
-              ),
-
-              // Sticky CTA
-              Positioned(
-                left: 16,
-                right: 16,
-                bottom: 16,
-                child: ElevatedButton.icon(
-                  onPressed: () => context.go('/provider_home'),
-                  icon: const Icon(
-                    Icons.handyman_outlined,
-                    color: Colors.white,
-                  ),
-                  label: const Text(
-                    'Offer your service',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50),
-                    backgroundColor: AppColors.primaryDark,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(26),
-                    ),
-                    elevation: 4,
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
+  Widget buildCTAButton() {
+    return Positioned(
+      left: 16,
+      right: 16,
+      bottom: 16,
+      child: ElevatedButton.icon(
+        onPressed: () => context.go('/provider_home'),
+        icon: const Icon(Icons.handyman_outlined, color: Colors.white),
+        label: const Text(
+          'Offer your service',
+          style: TextStyle(color: Colors.white),
+        ),
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(double.infinity, 50),
+          backgroundColor: AppColors.primaryDark,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(26),
+          ),
+          elevation: 4,
+        ),
       ),
     );
   }
@@ -336,7 +298,7 @@ class _HomePageState extends State<HomePage> {
   Widget providerCard(String name, String area, double rating, bool online) {
     return Card(
       color: Colors.white,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         onTap: () {
