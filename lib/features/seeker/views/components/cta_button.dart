@@ -3,11 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../theme/app_colors.dart';
 
 class CTAButton extends StatelessWidget {
-  final String route;
-  final String label;
-
-  const CTAButton({Key? key, required this.route, required this.label})
-    : super(key: key);
+  const CTAButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +12,12 @@ class CTAButton extends StatelessWidget {
       right: 16,
       bottom: 16,
       child: ElevatedButton.icon(
-        onPressed: () => context.go(route),
+        onPressed: () => context.go('/provider_home'),
         icon: const Icon(Icons.handyman_outlined, color: Colors.white),
-        label: Text(label, style: const TextStyle(color: Colors.white)),
+        label: const Text(
+          'Offer your service',
+          style: TextStyle(color: Colors.white),
+        ),
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(double.infinity, 50),
           backgroundColor: AppColors.primaryDark,
