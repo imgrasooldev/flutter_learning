@@ -80,7 +80,11 @@ class _HomePageState extends State<HomePage> {
       body: BlocBuilder<CategoryBloc, CategoryState>(
         builder: (context, state) {
           if (state is CategoryLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              ),
+            );
           } else if (state is CategoryLoaded) {
             _allServices = state.categories;
             return buildContent(context);
