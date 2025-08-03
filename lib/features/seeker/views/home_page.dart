@@ -8,7 +8,7 @@ import 'package:flutter_learning/features/seeker/bloc/service_providers/service_
 import 'package:flutter_learning/features/seeker/bloc/service_providers/service_provider_state.dart';
 import 'package:flutter_learning/features/seeker/models/category_model.dart';
 import 'package:flutter_learning/features/seeker/views/components/popular_services_grid.dart';
-import 'package:flutter_learning/features/seeker/views/components/top_providers_section.dart';
+import 'package:flutter_learning/features/seeker/views/components/top_providers_list.dart';
 import 'package:flutter_learning/features/seeker/views/components/search_bar.dart';
 import 'package:go_router/go_router.dart';
 import '../../../theme/app_colors.dart';

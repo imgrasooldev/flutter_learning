@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_learning/features/seeker/repo/top_service_providers_repository.dart';
+import 'package:flutter_learning/features/seeker/repo/service_providers_repository.dart';
 import 'service_provider_event.dart';
 import 'service_provider_state.dart';
 
