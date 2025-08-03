@@ -85,7 +85,10 @@ class ProviderDetailPage extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             area,
-                            style: const TextStyle(fontSize: 14, color: Colors.white70),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
                           ),
                           const SizedBox(height: 10),
                         ],
@@ -122,9 +125,21 @@ class ProviderDetailPage extends StatelessWidget {
                   const SizedBox(height: 30),
                   _buildSectionTitle("Customer Reviews"),
                   const SizedBox(height: 10),
-                  _buildReviewTile("Ahmed Khan", 4.5, "Very professional and timely service."),
-                  _buildReviewTile("Sana Malik", 5.0, "Highly recommended! Will book again."),
-                  _buildReviewTile("Bilal Tariq", 4.0, "Work was good but arrived a bit late."),
+                  _buildReviewTile(
+                    "Ahmed Khan",
+                    4.5,
+                    "Very professional and timely service.",
+                  ),
+                  _buildReviewTile(
+                    "Sana Malik",
+                    5.0,
+                    "Highly recommended! Will book again.",
+                  ),
+                  _buildReviewTile(
+                    "Bilal Tariq",
+                    4.0,
+                    "Work was good but arrived a bit late.",
+                  ),
                   const SizedBox(height: 40),
                   _buildBookingButton(context),
                 ],
@@ -176,7 +191,11 @@ class ProviderDetailPage extends StatelessWidget {
       label: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.check_circle, color: AppColors.primaryDark, size: 18),
+          const Icon(
+            Icons.check_circle,
+            color: AppColors.primaryDark,
+            size: 18,
+          ),
           const SizedBox(width: 6),
           Text(label),
         ],
@@ -218,7 +237,9 @@ class ProviderDetailPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 3))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 3)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,11 +278,16 @@ class ProviderDetailPage extends StatelessWidget {
           );
         },
         icon: const Icon(Icons.send, color: AppColors.background),
-        label: const Text("Send Booking Request", style: TextStyle(color: AppColors.background),),
+        label: const Text(
+          "Send Booking Request",
+          style: TextStyle(color: AppColors.background),
+        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryDark,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
           elevation: 4,
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
@@ -275,7 +301,12 @@ class WaveClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     final path = Path();
     path.lineTo(0, size.height - 60);
-    path.quadraticBezierTo(size.width / 2, size.height, size.width, size.height - 60);
+    path.quadraticBezierTo(
+      size.width / 2,
+      size.height,
+      size.width,
+      size.height - 60,
+    );
     path.lineTo(size.width, 0);
     path.close();
     return path;

@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import '../../../../theme/app_colors.dart';
+import '../../models/service_providers_model.dart';
 import '../../views/provider_detail_page.dart';
 
 class TopProvidersList extends StatelessWidget {
-  final List<Map<String, dynamic>> providers;
+  final List<ServiceProvider> providers;
 
   const TopProvidersList({super.key, required this.providers});
 
   @override
   Widget build(BuildContext context) {
+    if (providers.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text('No providers found near you.'),
+      );
+    }
+
     final screenWidth = MediaQuery.of(context).size.width;
     final horizontalPadding = screenWidth > 768 ? 32.0 : 16.0;
 
@@ -32,10 +40,10 @@ class TopProvidersList extends StatelessWidget {
             itemBuilder: (context, index) {
               final p = providers[index];
               return _ProviderCard(
-                name: p['name'],
-                area: p['area'],
-                rating: p['rating'],
-                online: p['online'] ?? false,
+                name: p.user.name,
+                area: p.area.name ?? 'Unknown Area', // <-- FIX HERE!
+                rating: 4.5,
+                online: true,
               );
             },
           ),

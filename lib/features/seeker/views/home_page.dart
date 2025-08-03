@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_learning/features/seeker/bloc/category_bloc.dart';
-import 'package:flutter_learning/features/seeker/bloc/category_event.dart';
-import 'package:flutter_learning/features/seeker/bloc/category_state.dart';
+import 'package:flutter_learning/features/seeker/bloc/category/category_bloc.dart';
+import 'package:flutter_learning/features/seeker/bloc/category/category_event.dart';
+import 'package:flutter_learning/features/seeker/bloc/category/category_state.dart';
+import 'package:flutter_learning/features/seeker/bloc/service_providers/service_provider_bloc.dart';
+import 'package:flutter_learning/features/seeker/bloc/service_providers/service_provider_event.dart';
+import 'package:flutter_learning/features/seeker/bloc/service_providers/service_provider_state.dart';
 import 'package:flutter_learning/features/seeker/models/category_model.dart';
 import 'package:flutter_learning/features/seeker/views/components/popular_services_grid.dart';
 import 'package:flutter_learning/features/seeker/views/components/top_providers_section.dart';
@@ -33,7 +36,7 @@ class _HomePageState extends State<HomePage> {
     {'title': 'Tailor', 'icon': Icons.checkroom},
   ];
 
-  final List<Map<String, dynamic>> _providers = [
+  /* final List<Map<String, dynamic>> _providers = [
     {
       'name': 'Ali Electrician',
       'area': 'Gulshan-e-Maymar',
@@ -53,7 +56,7 @@ class _HomePageState extends State<HomePage> {
       'rating': 4.6,
       'online': true,
     },
-  ];
+  ]; */
 
   @override
   void initState() {
@@ -70,6 +73,11 @@ class _HomePageState extends State<HomePage> {
                 .toList();
       });
     });
+
+    // Dispatch FetchServiceProviders event manually
+    context.read<ServiceProviderBloc>().add(
+      FetchServiceProviders(subcategoryId: 3, areaId: 5),
+    );
   }
 
   @override
@@ -161,7 +169,20 @@ class _HomePageState extends State<HomePage> {
                     services: _popularServices,
                     crossAxisCount: crossAxisCount,
                   ),
-                  TopProvidersList(providers: _providers),
+                  // TopProvidersList(providers: _providers),
+                  // 🔥 Add BlocBuilder for ServiceProviderBloc here
+                  BlocBuilder<ServiceProviderBloc, ServiceProviderState>(
+                    builder: (context, state) {
+                      if (state is ServiceProviderLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (state is ServiceProviderLoaded) {
+                        return TopProvidersList(providers: state.providers);
+                      } else if (state is ServiceProviderError) {
+                        return Center(child: Text('Error: ${state.message}'));
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ],
               ),
             ),

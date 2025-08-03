@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_learning/features/seeker/bloc/category_bloc.dart';
+import 'package:flutter_learning/features/seeker/bloc/category/category_bloc.dart';
+import 'package:flutter_learning/features/seeker/bloc/service_providers/service_provider_bloc.dart';
 import 'package:flutter_learning/features/seeker/repo/category_repository.dart';
+import 'package:flutter_learning/features/seeker/repo/top_service_providers_repository.dart';
 
 import 'app/router.dart';
 import 'features/auth/bloc/auth_bloc.dart';
@@ -22,6 +24,9 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<CategoryRepository>(
           create: (_) => CategoryRepository(),
         ),
+        RepositoryProvider<ServiceProviderRepository>(
+          create: (_) => ServiceProviderRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -33,6 +38,12 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create:
                 (context) => CategoryBloc(context.read<CategoryRepository>()),
+          ),
+          BlocProvider<ServiceProviderBloc>(
+            create:
+                (context) => ServiceProviderBloc(
+                  context.read<ServiceProviderRepository>(),
+                ),
           ),
         ],
         child: MaterialApp.router(

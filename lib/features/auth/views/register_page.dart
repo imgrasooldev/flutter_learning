@@ -35,7 +35,12 @@ class _RegisterPageState extends State<RegisterPage> {
           child: LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(20, 20, 20, viewInsets.bottom + 30),
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  20,
+                  20,
+                  viewInsets.bottom + 30,
+                ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
@@ -66,8 +71,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.primary,
                                 ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () => context.go('/login'),
+                                recognizer:
+                                    TapGestureRecognizer()
+                                      ..onTap = () => context.go('/login'),
                               ),
                             ],
                           ),
@@ -75,9 +81,17 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 32),
 
                         // Fields
-                        _buildTextField(controller: nameCtrl, label: 'Full Name', icon: Icons.person),
+                        _buildTextField(
+                          controller: nameCtrl,
+                          label: 'Full Name',
+                          icon: Icons.person,
+                        ),
                         const SizedBox(height: 18),
-                        _buildTextField(controller: emailCtrl, label: 'Email Address', icon: Icons.email),
+                        _buildTextField(
+                          controller: emailCtrl,
+                          label: 'Email Address',
+                          icon: Icons.email,
+                        ),
                         const SizedBox(height: 18),
                         _buildTextField(
                           controller: passCtrl,
@@ -86,11 +100,15 @@ class _RegisterPageState extends State<RegisterPage> {
                           obscure: _obscurePassword,
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                               color: AppColors.textMuted,
                             ),
                             onPressed: () {
-                              setState(() => _obscurePassword = !_obscurePassword);
+                              setState(
+                                () => _obscurePassword = !_obscurePassword,
+                              );
                             },
                           ),
                         ),
@@ -102,11 +120,15 @@ class _RegisterPageState extends State<RegisterPage> {
                           obscure: _obscureConfirm,
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                              _obscureConfirm
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                               color: AppColors.textMuted,
                             ),
                             onPressed: () {
-                              setState(() => _obscureConfirm = !_obscureConfirm);
+                              setState(
+                                () => _obscureConfirm = !_obscureConfirm,
+                              );
                             },
                           ),
                         ),
@@ -122,7 +144,10 @@ class _RegisterPageState extends State<RegisterPage> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    state.err.toString().replaceAll('Exception:', '').trim(),
+                                    state.err
+                                        .toString()
+                                        .replaceAll('Exception:', '')
+                                        .trim(),
                                   ),
                                 ),
                               );
@@ -130,46 +155,52 @@ class _RegisterPageState extends State<RegisterPage> {
                           },
                           builder: (context, state) {
                             return state is AuthLoading
-                                ? const Center(child: CircularProgressIndicator())
+                                ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
                                 : SizedBox(
-                                    width: double.infinity,
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                          colors: [
-                                            AppColors.primary,
-                                            AppColors.primaryDark,
-                                          ],
-                                        ),
-                                        borderRadius: BorderRadius.circular(14),
+                                  width: double.infinity,
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          AppColors.primary,
+                                          AppColors.primaryDark,
+                                        ],
                                       ),
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          context.read<AuthBloc>().add(
-                                                RegisterEvent(
-                                                  nameCtrl.text.trim(),
-                                                  emailCtrl.text.trim(),
-                                                  passCtrl.text.trim(),
-                                                  confirmCtrl.text.trim(),
-                                                ),
-                                              );
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.transparent,
-                                          shadowColor: Colors.transparent,
-                                          foregroundColor: AppColors.white,
-                                          padding: const EdgeInsets.symmetric(vertical: 16),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(14),
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        context.read<AuthBloc>().add(
+                                          RegisterEvent(
+                                            nameCtrl.text.trim(),
+                                            emailCtrl.text.trim(),
+                                            passCtrl.text.trim(),
+                                            confirmCtrl.text.trim(),
+                                          ),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.transparent,
+                                        shadowColor: Colors.transparent,
+                                        foregroundColor: AppColors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 16,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            14,
                                           ),
                                         ),
-                                        child: const Text(
-                                          "Register",
-                                          style: TextStyle(fontSize: 17),
-                                        ),
+                                      ),
+                                      child: const Text(
+                                        "Register",
+                                        style: TextStyle(fontSize: 17),
                                       ),
                                     ),
-                                  );
+                                  ),
+                                );
                           },
                         ),
 
@@ -274,10 +305,7 @@ class _RegisterPageState extends State<RegisterPage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           color: AppColors.white,
-          border: Border.all(
-            color: Colors.grey.shade300,
-            width: 1.2,
-          ),
+          border: Border.all(color: Colors.grey.shade300, width: 1.2),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.06),

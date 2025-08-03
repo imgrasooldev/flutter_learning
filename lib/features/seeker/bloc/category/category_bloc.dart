@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_learning/features/seeker/bloc/category_event.dart';
-import 'package:flutter_learning/features/seeker/bloc/category_state.dart';
+import 'package:flutter_learning/features/seeker/bloc/category/category_event.dart';
+import 'package:flutter_learning/features/seeker/bloc/category/category_state.dart';
 import 'package:flutter_learning/features/seeker/models/category_model.dart';
 import 'package:flutter_learning/features/seeker/repo/category_repository.dart';
 
