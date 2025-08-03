@@ -7,6 +7,8 @@ import 'package:flutter_learning/features/seeker/bloc/service_providers/service_
 import 'package:flutter_learning/features/seeker/bloc/service_providers/service_provider_event.dart';
 import 'package:flutter_learning/features/seeker/bloc/service_providers/service_provider_state.dart';
 import 'package:flutter_learning/features/seeker/models/category_model.dart';
+import 'package:flutter_learning/features/seeker/models/service_providers_model.dart';
+import 'package:flutter_learning/features/seeker/repo/service_providers_repository.dart';
 import 'package:flutter_learning/features/seeker/views/components/popular_services_grid.dart';
 import 'package:flutter_learning/features/seeker/views/components/top_providers_list.dart';
 import 'package:flutter_learning/features/seeker/views/components/search_bar.dart';
@@ -36,33 +38,28 @@ class _HomePageState extends State<HomePage> {
     {'title': 'Tailor', 'icon': Icons.checkroom},
   ];
 
-  /* final List<Map<String, dynamic>> _providers = [
-    {
-      'name': 'Ali Electrician',
-      'area': 'Gulshan-e-Maymar',
-      'rating': 4.9,
-      'online': true,
-    },
-    {'name': 'Zara Tutor', 'area': 'Nazimabad', 'rating': 4.8, 'online': true},
-    {
-      'name': 'Asif Mechanic',
-      'area': 'Ahsanabad',
-      'rating': 4.7,
-      'online': false,
-    },
-    {
-      'name': 'Qasim Plumber',
-      'area': 'Gulistan-e-Johar',
-      'rating': 4.6,
-      'online': true,
-    },
-  ]; */
+  List<ServiceProvider> _providers = [];
+  bool _isLoading = false;
+  bool _hasMore = true;
+  int _currentPage = 1;
+  final int _perPage = 10;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    // Dispatch FetchCategories event once when page loads
     context.read<CategoryBloc>().add(FetchCategories());
+
+    _fetchProviders(); // <-- Fetch first page
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent - 200 &&
+          !_isLoading &&
+          _hasMore) {
+        _fetchProviders(); // <-- Fetch next page
+      }
+    });
 
     _searchController.addListener(() {
       final query = _searchController.text.toLowerCase();
@@ -73,11 +70,33 @@ class _HomePageState extends State<HomePage> {
                 .toList();
       });
     });
+  }
 
-    // Dispatch FetchServiceProviders event manually
-    context.read<ServiceProviderBloc>().add(
-      FetchServiceProviders(subcategoryId: 3, areaId: 5),
-    );
+  Future<void> _fetchProviders() async {
+    if (_isLoading || !_hasMore) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final repository = ServiceProviderRepository();
+      final newProviders = await repository.fetchTopProviders(
+        subcategoryId: 3,
+        areaId: 5,
+        page: _currentPage,
+        perPage: _perPage,
+      );
+
+      setState(() {
+        _providers.addAll(newProviders);
+        _currentPage++;
+        if (newProviders.length < _perPage) {
+          _hasMore = false;
+        }
+      });
+    } catch (e) {
+      print('Failed to fetch providers: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -138,58 +157,45 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Widget buildContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final crossAxisCount =
-        screenWidth > 800
-            ? 5
-            : (screenWidth > 600
-                ? 4
-                : 3); // Adjust grid count based on screen width
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Stack(
+    final crossAxisCount = screenWidth > 800 ? 5 : (screenWidth > 600 ? 4 : 3);
+
+    return Stack(
+      children: [
+        ListView(
+          controller: _scrollController, // <-- Add Controller Here
+          padding: const EdgeInsets.only(bottom: 80),
           children: [
-            SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 80),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SearchBarWidget(
-                    controller: _searchController,
-                    filteredServices: _filteredServices,
-                    onSelect: (service) {
-                      _searchController.text = service.name;
-                      setState(() => _filteredServices.clear());
-                    },
-                  ),
-                  /*                   buildPopularServicesGrid(crossAxisCount, horizontalPadding),
-                  buildTopProvidersSection(horizontalPadding), */
-                  PopularServicesGrid(
-                    services: _popularServices,
-                    crossAxisCount: crossAxisCount,
-                  ),
-                  // TopProvidersList(providers: _providers),
-                  // 🔥 Add BlocBuilder for ServiceProviderBloc here
-                  BlocBuilder<ServiceProviderBloc, ServiceProviderState>(
-                    builder: (context, state) {
-                      if (state is ServiceProviderLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (state is ServiceProviderLoaded) {
-                        return TopProvidersList(providers: state.providers);
-                      } else if (state is ServiceProviderError) {
-                        return Center(child: Text('Error: ${state.message}'));
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
-                ],
-              ),
+            SearchBarWidget(
+              controller: _searchController,
+              filteredServices: _filteredServices,
+              onSelect: (service) {
+                _searchController.text = service.name;
+                setState(() => _filteredServices.clear());
+              },
             ),
-            const CTAButton(), // <--- Moved here
+            PopularServicesGrid(
+              services: _popularServices,
+              crossAxisCount: crossAxisCount,
+            ),
+            TopProvidersList(providers: _providers), // <-- Pass Providers Here
+            if (_isLoading)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Center(child: CircularProgressIndicator()),
+              ),
           ],
-        );
-      },
+        ),
+        const Positioned(bottom: 16, left: 16, right: 16, child: CTAButton()),
+      ],
     );
   }
 }

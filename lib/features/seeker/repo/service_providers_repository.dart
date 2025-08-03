@@ -24,6 +24,7 @@ class ServiceProviderRepository {
       }
 
       final List items = response.data['data']['items'];
+      // print('Fetched Providers JSON: $items');
       return items.map((json) => ServiceProvider.fromJson(json)).toList();
     } on DioException catch (e) {
       final message =
