@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import '../../../services/api_services.dart';
 import '../models/service_providers_model.dart';
 
@@ -6,16 +5,21 @@ class ServiceProviderRepository {
   final ApiService _api = ApiService();
 
   Future<List<ServiceProvider>> fetchTopProviders({
-    required int subcategoryId,
+    int? subcategoryId,
     required int areaId,
     int page = 1,
     int perPage = 10,
   }) async {
     try {
-      final response = await _api.get(
-        'service-providers?subcategoryId=$subcategoryId&areaId=$areaId&page=$page&per_page=$perPage',
-        auth: true,
-      );
+      String query = 'service-providers?';
+
+      if (subcategoryId != null) {
+        query +=
+            'subcategoryId[eq]=${subcategoryId != null && subcategoryId != 0 ? subcategoryId : ''}&';
+      }
+      query += 'areaId[eq]=$areaId&page=$page&per_page=$perPage';
+      final response = await _api.get(query, auth: true);
+      // print('API Query: $query');
 
       if (response.data['success'] != true) {
         throw Exception(
@@ -24,13 +28,15 @@ class ServiceProviderRepository {
       }
 
       final List items = response.data['data']['items'];
-      // print('Fetched Providers JSON: $items');
+
+      /* for (var item in items) {
+        final int fetchedSubcategoryId = item['subcategory_id'];
+        final int fetchedAreaId = item['area']['id'];
+        print('Subcategory ID: $fetchedSubcategoryId, Area ID: $fetchedAreaId');
+      } */
+
       return items.map((json) => ServiceProvider.fromJson(json)).toList();
-    } on DioException catch (e) {
-      final message =
-          e.response?.data['message'] ?? 'Failed to fetch providers';
-      throw Exception(message);
-    } catch (e, stacktrace) {
+    } catch (e) {
       throw Exception('An unexpected error occurred while fetching providers');
     }
   }

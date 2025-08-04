@@ -4,6 +4,7 @@ class ServiceProvider {
   final String title;
   final int? categoryId;
   final int subcategoryId;
+  final Subcategory? subcategory;
   final int areaId;
   final String experience;
   final List<String> availableDays;
@@ -18,6 +19,7 @@ class ServiceProvider {
     required this.title,
     required this.categoryId,
     required this.subcategoryId,
+    required this.subcategory,
     required this.areaId,
     required this.experience,
     required this.availableDays,
@@ -34,6 +36,10 @@ class ServiceProvider {
       title: json['title'] ?? '',
       categoryId: json['category_id'] ?? 0,
       subcategoryId: json['subcategory_id'] ?? 0,
+      subcategory:
+          json['subcategory'] != null
+              ? Subcategory.fromJson(json['subcategory'])
+              : null, // <-- PARSE SUBCATEGORY HERE
       areaId: json['area_id'] ?? 0,
       experience: json['experience'] ?? '',
       availableDays:
@@ -105,5 +111,16 @@ class Area {
 
   factory Area.fromJson(Map<String, dynamic> json) {
     return Area(id: json['id'], name: json['name']);
+  }
+}
+
+class Subcategory {
+  final int id;
+  final String name;
+
+  Subcategory({required this.id, required this.name});
+
+  factory Subcategory.fromJson(Map<String, dynamic> json) {
+    return Subcategory(id: json['id'] ?? 0, name: json['name'] ?? 'Unknown');
   }
 }

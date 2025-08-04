@@ -43,6 +43,7 @@ class TopProvidersList extends StatelessWidget {
                 name: p.user.name,
                 area: p.area.name ?? 'Unknown Area',
                 category: p.category.name,
+                subcategory: p.subcategory?.name ?? '',
                 rating: 4.5,
                 online: true, // <-- You can set this dynamically later.
               );
@@ -59,6 +60,7 @@ class _ProviderCard extends StatelessWidget {
   final String name;
   final String area;
   final String category;
+  final String subcategory;
   final double rating;
   final bool online;
 
@@ -66,6 +68,7 @@ class _ProviderCard extends StatelessWidget {
     required this.name,
     required this.area,
     required this.category,
+    required this.subcategory,
     required this.rating,
     required this.online,
   });
@@ -124,10 +127,15 @@ class _ProviderCard extends StatelessWidget {
                 ),
               ],
             ),
-            Text(
+            /* Text(
               category,
               style: const TextStyle(fontSize: 12, color: Colors.black54),
-            ),
+            ), */
+            if (subcategory.isNotEmpty)
+              Text(
+                subcategory, // Subcategory Name
+                style: const TextStyle(fontSize: 12, color: Colors.black87),
+              ),
           ],
         ),
         trailing: Row(

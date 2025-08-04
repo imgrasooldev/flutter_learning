@@ -25,6 +25,7 @@ class _HomePageState extends State<HomePage> {
 
   List<CategoryModel> _allServices = [];
   List<CategoryModel> _filteredServices = [];
+  int? _selectedSubCategoryId;
 
   final List<Map<String, dynamic>> _popularServices = [
     {'title': 'Electrician', 'icon': Icons.electrical_services},
@@ -69,15 +70,25 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<void> _fetchProviders() async {
-    if (_isLoading || !_hasMore) return;
+  Future<void> _fetchProviders({bool reset = false}) async {
+    if (_isLoading || (!_hasMore && !reset)) return;
+
+    if (reset) {
+      setState(() {
+        _providers.clear();
+        _currentPage = 1;
+        _hasMore = true;
+      });
+    }
 
     setState(() => _isLoading = true);
     try {
       final repository = ServiceProviderRepository();
       final newProviders = await repository.fetchTopProviders(
-        subcategoryId: 3,
-        areaId: 5,
+        subcategoryId:
+            _selectedSubCategoryId ??
+            0, // Pass selected subcategory or default (0 => mix)
+        areaId: 1,
         page: _currentPage,
         perPage: _perPage,
       );
@@ -176,9 +187,20 @@ class _HomePageState extends State<HomePage> {
               filteredServices: _filteredServices,
               onSelect: (service) {
                 _searchController.text = service.name;
-                setState(() => _filteredServices.clear());
+                _selectedSubCategoryId = service.id;
+                setState(() {
+                  _filteredServices.clear();
+                });
+                _fetchProviders(reset: true);
+              },
+              onClear: () {
+                if (_selectedSubCategoryId != null) {
+                  _selectedSubCategoryId = null;
+                  _fetchProviders(reset: true); // Reset to Mixed Providers
+                }
               },
             ),
+
             PopularServicesGrid(
               services: _popularServices,
               crossAxisCount: crossAxisCount,
@@ -187,7 +209,13 @@ class _HomePageState extends State<HomePage> {
             if (_isLoading)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primary,
+                    ), // <-- FIX COLOR
+                  ),
+                ),
               ),
           ],
         ),

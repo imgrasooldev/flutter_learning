@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_learning/features/seeker/models/category_model.dart';
+import '../../models/category_model.dart';
 import '../../../../theme/app_colors.dart';
 
-class SearchBarWidget extends StatelessWidget {
+class SearchBarWidget extends StatefulWidget {
   final TextEditingController controller;
   final List<CategoryModel> filteredServices;
   final Function(CategoryModel) onSelect;
+  final VoidCallback onClear;
 
   const SearchBarWidget({
     super.key,
     required this.controller,
     required this.filteredServices,
     required this.onSelect,
+    required this.onClear,
   });
 
   @override
+  State<SearchBarWidget> createState() => _SearchBarWidgetState();
+}
+
+class _SearchBarWidgetState extends State<SearchBarWidget> {
+  @override
   Widget build(BuildContext context) {
-    final bool isTyping = controller.text.isNotEmpty;
+    final bool isTyping = widget.controller.text.isNotEmpty;
 
     return Column(
       children: [
@@ -25,7 +32,7 @@ class SearchBarWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           shadowColor: Colors.black12,
           child: TextField(
-            controller: controller,
+            controller: widget.controller,
             decoration: InputDecoration(
               hintText: 'Search services e.g., plumber, tutor...',
               prefixIcon: const Icon(Icons.search, color: AppColors.primary),
@@ -34,7 +41,8 @@ class SearchBarWidget extends StatelessWidget {
                       ? IconButton(
                         icon: const Icon(Icons.clear, color: AppColors.primary),
                         onPressed: () {
-                          controller.clear();
+                          widget.controller.clear();
+                          widget.onClear(); // <-- Trigger clear action
                         },
                       )
                       : null,
@@ -48,7 +56,7 @@ class SearchBarWidget extends StatelessWidget {
             ),
           ),
         ),
-        if (filteredServices.isNotEmpty)
+        if (widget.filteredServices.isNotEmpty)
           Container(
             margin: const EdgeInsets.only(top: 8),
             constraints: const BoxConstraints(maxHeight: 200),
@@ -64,12 +72,15 @@ class SearchBarWidget extends StatelessWidget {
               ],
             ),
             child: ListView.builder(
-              itemCount: filteredServices.length,
+              itemCount: widget.filteredServices.length,
+              shrinkWrap: true,
               itemBuilder: (context, index) {
-                final service = filteredServices[index];
+                final service = widget.filteredServices[index];
                 return ListTile(
                   title: Text(service.name),
-                  onTap: () => onSelect(service),
+                  onTap: () {
+                    widget.onSelect(service); // <-- Trigger select action
+                  },
                 );
               },
             ),
