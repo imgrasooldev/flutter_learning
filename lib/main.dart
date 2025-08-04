@@ -4,6 +4,8 @@ import 'package:flutter_learning/features/seeker/bloc/category/category_bloc.dar
 import 'package:flutter_learning/features/seeker/bloc/service_providers/service_provider_bloc.dart';
 import 'package:flutter_learning/features/seeker/repo/category_repository.dart';
 import 'package:flutter_learning/features/seeker/repo/service_providers_repository.dart';
+import 'package:flutter_learning/features/user/bloc/profile_bloc.dart';
+import 'package:flutter_learning/features/user/repo/profile_repository.dart';
 
 import 'app/router.dart';
 import 'features/auth/bloc/auth_bloc.dart';
@@ -27,6 +29,7 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<ServiceProviderRepository>(
           create: (_) => ServiceProviderRepository(),
         ),
+        RepositoryProvider<UserRepository>(create: (_) => UserRepository()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -44,6 +47,9 @@ class MyApp extends StatelessWidget {
                 (context) => ServiceProviderBloc(
                   context.read<ServiceProviderRepository>(),
                 ),
+          ),
+          BlocProvider<ProfileBloc>(
+            create: (_) => ProfileBloc(UserRepository()),
           ),
         ],
         child: MaterialApp.router(

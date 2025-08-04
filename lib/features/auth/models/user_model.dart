@@ -2,30 +2,56 @@ class UserModel {
   final String name;
   final String email;
   final String token;
-  UserModel({required this.name, required this.email, required this.token});
+  final String? phone;
+  final int? cityId;
+  final String? bio;
+  UserModel({
+    required this.name,
+    required this.email,
+    required this.token,
+    this.phone,
+    this.cityId,
+    this.bio,
+  });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    // Check if 'user' exists inside the response
     final userData = json['user'];
 
     if (userData != null) {
-      // From registration: token is in root, user is nested
       return UserModel(
         name: userData['name'] ?? '',
         email: userData['email'] ?? '',
         token: json['token'] ?? '',
+        phone: userData['phone'],
+        cityId:
+            userData['city_id'] != null
+                ? int.tryParse(userData['city_id'].toString())
+                : null,
+        bio: userData['bio'],
       );
     } else {
-      // From login: all fields are directly inside data
       return UserModel(
         name: json['name'] ?? '',
         email: json['email'] ?? '',
         token: json['token'] ?? '',
+        phone: json['phone'],
+        cityId:
+            json['city_id'] != null
+                ? int.tryParse(json['city_id'].toString())
+                : null,
+        bio: json['bio'],
       );
     }
   }
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'email': email, 'token': token};
+    return {
+      'name': name,
+      'email': email,
+      'token': token,
+      'phone': phone,
+      'city_id': cityId,
+      'bio': bio,
+    };
   }
 }
