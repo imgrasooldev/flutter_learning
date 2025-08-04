@@ -85,9 +85,7 @@ class _HomePageState extends State<HomePage> {
     try {
       final repository = ServiceProviderRepository();
       final newProviders = await repository.fetchTopProviders(
-        subcategoryId:
-            _selectedSubCategoryId ??
-            0, // Pass selected subcategory or default (0 => mix)
+        subcategoryId: _selectedSubCategoryId ?? 0,
         areaId: 1,
         page: _currentPage,
         perPage: _perPage,
@@ -112,22 +110,27 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: buildAppBar(context),
-      body: BlocBuilder<CategoryBloc, CategoryState>(
-        builder: (context, state) {
-          if (state is CategoryLoading) {
-            return const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-              ),
-            );
-          } else if (state is CategoryLoaded) {
-            _allServices = state.categories;
-            return buildContent(context);
-          } else if (state is CategoryError) {
-            return Center(child: Text('Error: ${state.message}'));
-          }
-          return const SizedBox.shrink();
-        },
+      body: GestureDetector(
+        onTap:
+            () =>
+                FocusScope.of(context).unfocus(), // <-- Dismiss Keyboard on Tap
+        child: BlocBuilder<CategoryBloc, CategoryState>(
+          builder: (context, state) {
+            if (state is CategoryLoading) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                ),
+              );
+            } else if (state is CategoryLoaded) {
+              _allServices = state.categories;
+              return buildContent(context);
+            } else if (state is CategoryError) {
+              return Center(child: Text('Error: ${state.message}'));
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }
@@ -179,7 +182,7 @@ class _HomePageState extends State<HomePage> {
     return Stack(
       children: [
         ListView(
-          controller: _scrollController, // <-- Add Controller Here
+          controller: _scrollController,
           padding: const EdgeInsets.only(bottom: 80),
           children: [
             SearchBarWidget(
@@ -188,24 +191,28 @@ class _HomePageState extends State<HomePage> {
               onSelect: (service) {
                 _searchController.text = service.name;
                 _selectedSubCategoryId = service.id;
-                setState(() {
-                  _filteredServices.clear();
-                });
+                _filteredServices.clear();
+
+                _scrollController.animateTo(
+                  0,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                ); // <-- Auto Scroll to Top on Select
+
                 _fetchProviders(reset: true);
               },
               onClear: () {
                 if (_selectedSubCategoryId != null) {
                   _selectedSubCategoryId = null;
-                  _fetchProviders(reset: true); // Reset to Mixed Providers
+                  _fetchProviders(reset: true);
                 }
               },
             ),
-
             PopularServicesGrid(
               services: _popularServices,
               crossAxisCount: crossAxisCount,
             ),
-            TopProvidersList(providers: _providers), // <-- Pass Providers Here
+            TopProvidersList(providers: _providers),
             if (_isLoading)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
@@ -213,7 +220,7 @@ class _HomePageState extends State<HomePage> {
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
                       AppColors.primary,
-                    ), // <-- FIX COLOR
+                    ), // Loader Color Fixed
                   ),
                 ),
               ),
