@@ -24,6 +24,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   @override
   Widget build(BuildContext context) {
     final bool isTyping = widget.controller.text.isNotEmpty;
+    final bool shouldShowSuggestions = widget.controller.text.length >= 1;
 
     return Column(
       children: [
@@ -57,7 +58,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
           ),
         ),
         if (widget.filteredServices.isNotEmpty)
-          Container(
+          /* Container(
             margin: const EdgeInsets.only(top: 8),
             constraints: const BoxConstraints(maxHeight: 200),
             decoration: BoxDecoration(
@@ -84,7 +85,36 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 );
               },
             ),
-          ),
+          ), */
+          if (shouldShowSuggestions && widget.filteredServices.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.only(top: 8),
+              constraints: const BoxConstraints(maxHeight: 200),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: ListView.builder(
+                itemCount: widget.filteredServices.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final service = widget.filteredServices[index];
+                  return ListTile(
+                    title: Text(service.name),
+                    onTap: () {
+                      widget.onSelect(service); // <-- Trigger select action
+                    },
+                  );
+                },
+              ),
+            ),
       ],
     );
   }
