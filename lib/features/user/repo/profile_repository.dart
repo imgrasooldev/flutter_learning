@@ -13,9 +13,7 @@ class UserRepository {
           response.data['message'] ?? 'Failed to fetch user profile',
         );
       }
-      print("user profile fetched: $response");
       final userData = response.data['data'];
-
       return UserModel.fromJson(userData);
     } catch (e, stackTrace) {
       throw Exception('Failed to fetch user profile: $e');
