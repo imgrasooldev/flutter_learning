@@ -166,13 +166,7 @@ class _HomePageState extends State<HomePage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder:
-                    (_) => BlocProvider(
-                      create: (context) => ProfileBloc(UserRepository()),
-                      child: const ProfilePage(),
-                    ),
-              ),
+              MaterialPageRoute(builder: (_) => const ProfilePage()),
             );
           },
           icon: const Icon(Icons.person_outline, color: AppColors.primary),

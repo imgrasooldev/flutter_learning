@@ -22,7 +22,11 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    context.read<ProfileBloc>().add(FetchUserProfile());
+    // context.read<ProfileBloc>().add(FetchUserProfile());
+    final bloc = context.read<ProfileBloc>();
+    if (bloc.state is! ProfileLoaded) {
+      bloc.add(FetchUserProfile());
+    }
   }
 
   void editProfile() {
