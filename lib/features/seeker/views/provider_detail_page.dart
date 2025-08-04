@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
+import '../../seeker/views/booking_bottom_sheet.dart';
 
 class ProviderDetailPage extends StatelessWidget {
   final String name;
@@ -19,132 +20,140 @@ class ProviderDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            backgroundColor: AppColors.primary,
-            expandedHeight: 260,
-            pinned: true,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                children: [
-                  ClipPath(
-                    clipper: WaveClipper(),
-                    child: Container(
-                      color: AppColors.primary,
-                      height: double.infinity,
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 12,
-                                  offset: Offset(0, 6),
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                backgroundColor: AppColors.primary,
+                expandedHeight: 260,
+                pinned: true,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Stack(
+                    children: [
+                      ClipPath(
+                        clipper: WaveClipper(),
+                        child: Container(
+                          color: AppColors.primary,
+                          height: double.infinity,
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 12,
+                                      offset: Offset(0, 6),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(50),
-                              child: Container(
-                                color: Colors.white,
-                                child: const Icon(
-                                  Icons.person,
-                                  size: 60,
-                                  color: AppColors.primaryDark,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: Container(
+                                    color: Colors.white,
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 60,
+                                      color: AppColors.primaryDark,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                              const SizedBox(height: 12),
+                              Text(
+                                name,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                area,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                            ],
                           ),
-                          const SizedBox(height: 12),
-                          Text(
-                            name,
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            area,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.white70,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(child: _buildStatusRow()),
-                  const SizedBox(height: 30),
-                  _buildSectionTitle("Services Offered"),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 10,
-                    children: [
-                      _serviceChip("AC Repair"),
-                      _serviceChip("Wiring"),
-                      _serviceChip("Fan Installation"),
                     ],
                   ),
-                  const SizedBox(height: 30),
-                  _buildSectionTitle("Recent Work"),
-                  const SizedBox(height: 10),
-                  _buildRecentWorkGallery(),
-                  const SizedBox(height: 30),
-                  _buildSectionTitle("Customer Reviews"),
-                  const SizedBox(height: 10),
-                  _buildReviewTile(
-                    "Ahmed Khan",
-                    4.5,
-                    "Very professional and timely service.",
-                  ),
-                  _buildReviewTile(
-                    "Sana Malik",
-                    5.0,
-                    "Highly recommended! Will book again.",
-                  ),
-                  _buildReviewTile(
-                    "Bilal Tariq",
-                    4.0,
-                    "Work was good but arrived a bit late.",
-                  ),
-                  const SizedBox(height: 40),
-                  _buildBookingButton(context),
-                ],
+                ),
               ),
-            ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 100), // Bottom padding for fixed button
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(child: _buildStatusRow()),
+                      const SizedBox(height: 30),
+                      _buildSectionTitle("Services Offered"),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 10,
+                        children: [
+                          _serviceChip("AC Repair"),
+                          _serviceChip("Wiring"),
+                          _serviceChip("Fan Installation"),
+                        ],
+                      ),
+                      const SizedBox(height: 30),
+                      _buildSectionTitle("Recent Work"),
+                      const SizedBox(height: 10),
+                      _buildRecentWorkGallery(),
+                      const SizedBox(height: 30),
+                      _buildSectionTitle("Customer Reviews"),
+                      const SizedBox(height: 10),
+                      _buildReviewTile(
+                        "Ahmed Khan",
+                        4.5,
+                        "Very professional and timely service.",
+                      ),
+                      _buildReviewTile(
+                        "Sana Malik",
+                        5.0,
+                        "Highly recommended! Will book again.",
+                      ),
+                      _buildReviewTile(
+                        "Bilal Tariq",
+                        4.0,
+                        "Work was good but arrived a bit late.",
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 20,
+            child: _buildBookingButton(context),
           ),
         ],
       ),
@@ -273,8 +282,16 @@ class ProviderDetailPage extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Booking request sent!")),
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            builder: (context) => BookingBottomSheet(
+              providerName: name,
+              serviceType: 'between', // You can pass 'single' as needed.
+            ),
           );
         },
         icon: const Icon(Icons.send, color: AppColors.background),

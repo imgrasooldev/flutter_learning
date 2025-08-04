@@ -9,9 +9,7 @@ import 'package:flutter_learning/features/seeker/repo/service_providers_reposito
 import 'package:flutter_learning/features/seeker/views/components/popular_services_grid.dart';
 import 'package:flutter_learning/features/seeker/views/components/top_providers_list.dart';
 import 'package:flutter_learning/features/seeker/views/components/search_bar.dart';
-import 'package:flutter_learning/features/user/bloc/profile_bloc.dart';
 import 'package:flutter_learning/features/user/profile_page.dart';
-import 'package:flutter_learning/features/user/repo/profile_repository.dart';
 import '../../../theme/app_colors.dart';
 import 'package:flutter_learning/features/seeker/views/components/cta_button.dart';
 
