@@ -39,9 +39,11 @@ class _JobPostPageState extends State<JobPostPage> {
 
   @override
   Widget build(BuildContext context) {
+    final viewInsets = MediaQuery.of(context).viewInsets;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: const Color(0xFFF9F9F9),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Post Your Job',
@@ -49,81 +51,75 @@ class _JobPostPageState extends State<JobPostPage> {
         ),
         backgroundColor: AppColors.primary,
         elevation: 0,
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ), // <-- This line makes Back Button white
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            padding: EdgeInsets.only(
-              left: 24,
-              right: 24,
-              top: 16,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(24, 20, 24, viewInsets.bottom + 30),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _inputField(
+              controller: _titleController,
+              label: 'Job Title',
+              hint: 'Enter job title...',
+              icon: Icons.work_outline,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _inputField(
-                  controller: _titleController,
-                  label: 'Job Title',
-                  hint: 'Enter job title...',
-                  icon: Icons.work_outline,
+            const SizedBox(height: 20),
+            _inputField(
+              controller: _descriptionController,
+              label: 'Description',
+              hint: 'Describe the job...',
+              icon: Icons.description_outlined,
+              maxLines: 4,
+            ),
+            const SizedBox(height: 20),
+            _categoryDropdown(),
+            const SizedBox(height: 20),
+            _selectableField(
+              label: 'Select Date',
+              value:
+                  _selectedDate != null
+                      ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
+                      : '',
+              icon: Icons.calendar_today_outlined,
+              onTap: _pickDate,
+            ),
+            const SizedBox(height: 20),
+            _selectableField(
+              label: 'Select Time Slot',
+              value:
+                  _selectedTime != null ? _selectedTime!.format(context) : '',
+              icon: Icons.access_time,
+              onTap: _pickTime,
+            ),
+            const SizedBox(height: 30),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.primary, AppColors.primaryDark],
                 ),
-                const SizedBox(height: 20),
-                _inputField(
-                  controller: _descriptionController,
-                  label: 'Description',
-                  hint: 'Describe the job...',
-                  icon: Icons.description_outlined,
-                  maxLines: 4,
-                ),
-                const SizedBox(height: 20),
-                _categoryDropdown(),
-                const SizedBox(height: 20),
-                _selectableField(
-                  label: 'Select Date',
-                  value:
-                      _selectedDate != null
-                          ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
-                          : '',
-                  icon: Icons.calendar_today_outlined,
-                  onTap: _pickDate,
-                ),
-                const SizedBox(height: 20),
-                _selectableField(
-                  label: 'Select Time Slot',
-                  value:
-                      _selectedTime != null
-                          ? _selectedTime!.format(context)
-                          : '',
-                  icon: Icons.access_time,
-                  onTap: _pickTime,
-                ),
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: _submitJob,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 4,
-                    shadowColor: AppColors.primary.withOpacity(0.3),
-                  ),
-                  child: const Text(
-                    'Submit Job Request',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: ElevatedButton(
+                onPressed: _submitJob,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                const SizedBox(height: 16),
-              ],
+                child: const Text(
+                  'Submit Job Request',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                ),
+              ),
             ),
-          );
-        },
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
   }
@@ -136,38 +132,29 @@ class _JobPostPageState extends State<JobPostPage> {
     int maxLines = 1,
   }) {
     return Material(
-      elevation: 1.5,
-      borderRadius: BorderRadius.circular(14),
+      elevation: 2.5,
       shadowColor: Colors.black12,
+      borderRadius: BorderRadius.circular(14),
       child: TextField(
         controller: controller,
         maxLines: maxLines,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(
+          labelStyle: const TextStyle(
             color: AppColors.primary,
-            fontSize: 15.5,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
           ),
           hintText: hint,
           prefixIcon: Icon(icon, color: AppColors.primary),
           filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
+          fillColor: AppColors.fieldFill,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: AppColors.primary, width: 1.2),
+            borderSide: BorderSide.none,
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: AppColors.primary, width: 1.5),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: AppColors.primary, width: 1.2),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
           ),
         ),
       ),
@@ -176,7 +163,7 @@ class _JobPostPageState extends State<JobPostPage> {
 
   Widget _categoryDropdown() {
     return Material(
-      elevation: 1.5,
+      elevation: 2.5,
       borderRadius: BorderRadius.circular(14),
       shadowColor: Colors.black12,
       child: DropdownButtonFormField<CategoryModel>(
@@ -185,28 +172,19 @@ class _JobPostPageState extends State<JobPostPage> {
         icon: const Icon(Icons.keyboard_arrow_down),
         decoration: InputDecoration(
           labelText: 'Select Category',
-          labelStyle: TextStyle(
+          labelStyle: const TextStyle(
             color: AppColors.primary,
-            fontSize: 15.5,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
           ),
           filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
+          fillColor: AppColors.fieldFill,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: AppColors.primary, width: 1.2),
+            borderSide: BorderSide.none,
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: AppColors.primary, width: 1.5),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: AppColors.primary, width: 1.2),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
           ),
         ),
         items:
@@ -235,7 +213,7 @@ class _JobPostPageState extends State<JobPostPage> {
   }) {
     final bool isSelected = value.isNotEmpty;
     return Material(
-      elevation: 1.5,
+      elevation: 2.5,
       borderRadius: BorderRadius.circular(14),
       shadowColor: Colors.black12,
       child: InkWell(
@@ -243,9 +221,8 @@ class _JobPostPageState extends State<JobPostPage> {
         borderRadius: BorderRadius.circular(14),
         child: Ink(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.fieldFill,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.primary, width: 1.2),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Row(
@@ -257,7 +234,10 @@ class _JobPostPageState extends State<JobPostPage> {
                   isSelected ? value : label,
                   style: TextStyle(
                     fontSize: 15.5,
-                    color: isSelected ? Colors.black : Colors.grey,
+                    color:
+                        isSelected
+                            ? AppColors.textPrimary
+                            : AppColors.primary, // <-- FIXED
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -276,6 +256,24 @@ class _JobPostPageState extends State<JobPostPage> {
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.primaryDark,
+              secondary: AppColors.primaryDark,
+              onPrimary: Colors.white,
+              onSurface: Colors.black87,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primaryDark,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (pickedDate != null) {
       setState(() => _selectedDate = pickedDate);
@@ -286,6 +284,32 @@ class _JobPostPageState extends State<JobPostPage> {
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.primaryDark,
+              secondary: AppColors.primaryDark,
+              onPrimary: Colors.white,
+              onSurface: Colors.black87,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primaryDark,
+              ),
+            ),
+            timePickerTheme: TimePickerThemeData(
+              dialHandColor: AppColors.primaryDark,
+              dialBackgroundColor: AppColors.primary.withOpacity(0.1),
+              hourMinuteColor: AppColors.primaryDark,
+              hourMinuteTextColor: Colors.white,
+              entryModeIconColor: AppColors.primaryDark,
+              helpTextStyle: const TextStyle(color: AppColors.primaryDark),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (pickedTime != null) {
       setState(() => _selectedTime = pickedTime);
