@@ -25,160 +25,105 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
   TimeOfDay? toTime;
   TextEditingController commentsController = TextEditingController();
 
-  Future<void> _pickStartDate() async {
-    final DateTime? date = await showDatePicker(
+  Future<void> _pickDate({required bool isStart}) async {
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now().add(const Duration(days: 1)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 30)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryDark,
-              secondary: AppColors.primaryDark, // fix for accent minute dial
-              onPrimary: Colors.white,
-              onSurface: AppColors.textPrimary,
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primaryDark,
-              ),
-            ),
-          ),
-          child: child!,
-        );
-      },
+      builder: (context, child) => _buildPickerTheme(context, child!),
     );
-    if (date != null) {
-      setState(() => startDate = date);
+    if (pickedDate != null) {
+      setState(() {
+        if (isStart) {
+          startDate = pickedDate;
+          if (widget.serviceType == 'single') {
+            endDate = null; // reset endDate in single slot
+          }
+        } else {
+          endDate = pickedDate;
+        }
+      });
     }
   }
 
-  Future<void> _pickEndDate() async {
-    final DateTime? date = await showDatePicker(
-      context: context,
-      initialDate: startDate ?? DateTime.now().add(const Duration(days: 1)),
-      firstDate: startDate ?? DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 30)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryDark,
-              secondary: AppColors.primaryDark,
-              onPrimary: Colors.white,
-              onSurface: AppColors.textPrimary,
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primaryDark,
-              ),
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (date != null) {
-      setState(() => endDate = date);
-    }
-  }
-
-  Future<void> _pickFromTime() async {
-    final TimeOfDay? time = await showTimePicker(
+  Future<void> _pickTime({required bool isFrom}) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            timePickerTheme: TimePickerThemeData(
-              dialHandColor: AppColors.primaryDark,
-              dialBackgroundColor: AppColors.primary.withOpacity(0.1),
-              hourMinuteColor: AppColors.primaryDark,
-              hourMinuteTextColor: Colors.white,
-              entryModeIconColor: AppColors.primaryDark,
-              helpTextStyle: const TextStyle(color: AppColors.primaryDark),
-            ),
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryDark,
-              secondary: AppColors.primaryDark,
-              onPrimary: Colors.white,
-              onSurface: AppColors.textPrimary,
-            ),
-          ),
-          child: child!,
-        );
-      },
+      builder: (context, child) => _buildPickerTheme(context, child!),
     );
-    if (time != null) {
-      setState(() => fromTime = time);
+    if (pickedTime != null) {
+      setState(() {
+        if (isFrom) {
+          fromTime = pickedTime;
+        } else {
+          toTime = pickedTime;
+        }
+      });
     }
   }
 
-  Future<void> _pickToTime() async {
-    final TimeOfDay? time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            timePickerTheme: TimePickerThemeData(
-              dialHandColor: AppColors.primaryDark,
-              dialBackgroundColor: AppColors.primary.withOpacity(0.1),
-              hourMinuteColor: AppColors.primaryDark,
-              hourMinuteTextColor: Colors.white,
-              entryModeIconColor: AppColors.primaryDark,
-              helpTextStyle: const TextStyle(color: AppColors.primaryDark),
-            ),
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryDark,
-              secondary: AppColors.primaryDark,
-              onPrimary: Colors.white,
-              onSurface: AppColors.textPrimary,
-            ),
-          ),
-          child: child!,
-        );
-      },
+  Widget _buildPickerTheme(BuildContext context, Widget child) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        colorScheme: ColorScheme.light(
+          primary: AppColors.primaryDark,
+          secondary: AppColors.primaryDark,
+          onPrimary: Colors.white,
+          onSurface: AppColors.textPrimary,
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(foregroundColor: AppColors.primaryDark),
+        ),
+        timePickerTheme: TimePickerThemeData(
+          dialHandColor: AppColors.primaryDark,
+          dialBackgroundColor: AppColors.primary.withOpacity(0.1),
+          hourMinuteColor: AppColors.primaryDark,
+          hourMinuteTextColor: Colors.white,
+          entryModeIconColor: AppColors.primaryDark,
+          helpTextStyle: const TextStyle(color: AppColors.primaryDark),
+        ),
+      ),
+      child: child,
     );
-    if (time != null) {
-      setState(() => toTime = time);
-    }
   }
 
   void _submitBooking() {
     if (startDate == null) {
-      _showError(isUrdu ? 'Start Date chunein' : 'Please select start date');
+      _showError('Please select start date');
       return;
     }
 
     if (widget.serviceType == 'between' && endDate == null) {
-      _showError(isUrdu ? 'End Date chunein' : 'Please select end date');
+      _showError('Please select end date');
       return;
     }
 
     if (fromTime == null || toTime == null) {
-      _showError(isUrdu ? 'Apni Availability Time chunein' : 'Select your availability time');
+      _showError('Select your availability time');
       return;
     }
 
-    String bookingDetails = "${DateFormat('dd MMM yyyy').format(startDate!)}";
+    String bookingDetails = DateFormat('dd MMM yyyy').format(startDate!);
 
     if (widget.serviceType == 'between' && endDate != null) {
       bookingDetails += " - ${DateFormat('dd MMM yyyy').format(endDate!)}";
     }
 
-    bookingDetails += " ${isUrdu ? 'ko' : 'from'} ${fromTime!.format(context)} to ${toTime!.format(context)}";
+    bookingDetails +=
+        " from ${fromTime!.format(context)} to ${toTime!.format(context)}";
 
     Navigator.pop(context); // Close Bottom Sheet
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text((isUrdu ? 'Booking bhej di gayi' : 'Booking sent') + " $bookingDetails")),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text("Booking sent: $bookingDetails")));
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -195,60 +140,29 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(width: 40),
-                  Container(
-                    width: 40,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.black26,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, size: 28, color: Colors.black54),
-                  ),
-                ],
-              ),
+              _topBar(),
               const SizedBox(height: 20),
-              Row(
-                children: [
-                  Text(
-                    isUrdu
-                        ? (widget.serviceType == 'between'
-                            ? "Select Start & End Dates"
-                            : "Apni Availability Hours ka intikhab karein")
-                        : (widget.serviceType == 'between'
-                            ? "Select Start & End Dates"
-                            : "Select Your Availability Hours"),
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: () => setState(() => isUrdu = !isUrdu),
-                    icon: const Icon(Icons.language, color: AppColors.primaryDark),
-                  )
-                ],
-              ),
+              _heading(),
               const SizedBox(height: 20),
               _bigButton(
                 icon: Icons.calendar_today,
-                label: startDate != null
-                    ? DateFormat('dd MMM yyyy').format(startDate!)
-                    : (isUrdu ? 'Start Date Chunein' : 'Pick Start Date'),
-                onTap: _pickStartDate,
+                label:
+                    startDate != null
+                        ? DateFormat('dd MMM yyyy').format(startDate!)
+                        : (widget.serviceType == 'between'
+                            ? 'Pick Start Date'
+                            : 'Pick Date'),
+                onTap: () => _pickDate(isStart: true),
               ),
               if (widget.serviceType == 'between') ...[
                 const SizedBox(height: 12),
                 _bigButton(
                   icon: Icons.calendar_today,
-                  label: endDate != null
-                      ? DateFormat('dd MMM yyyy').format(endDate!)
-                      : (isUrdu ? 'End Date Chunein' : 'Pick End Date'),
-                  onTap: _pickEndDate,
+                  label:
+                      endDate != null
+                          ? DateFormat('dd MMM yyyy').format(endDate!)
+                          : 'Pick End Date',
+                  onTap: () => _pickDate(isStart: false),
                 ),
               ],
               const SizedBox(height: 12),
@@ -257,20 +171,20 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                   Expanded(
                     child: _bigButton(
                       icon: Icons.login,
-                      label: fromTime != null
-                          ? fromTime!.format(context)
-                          : (isUrdu ? 'From Time' : 'From Time'),
-                      onTap: _pickFromTime,
+                      label:
+                          fromTime != null
+                              ? fromTime!.format(context)
+                              : 'From Time',
+                      onTap: () => _pickTime(isFrom: true),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: _bigButton(
                       icon: Icons.logout,
-                      label: toTime != null
-                          ? toTime!.format(context)
-                          : (isUrdu ? 'To Time' : 'To Time'),
-                      onTap: _pickToTime,
+                      label:
+                          toTime != null ? toTime!.format(context) : 'To Time',
+                      onTap: () => _pickTime(isFrom: false),
                     ),
                   ),
                 ],
@@ -280,8 +194,10 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                 controller: commentsController,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  hintText: isUrdu ? 'Kisi cheez ki tafseelat likhain...' : 'Add any specific instructions...',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  hintText: 'Add any specific instructions...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -289,15 +205,20 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: _submitBooking,
-                  icon: const Icon(Icons.send, color: Colors.white,),
+                  icon: const Icon(Icons.send, color: Colors.white),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryDark,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
-                  label: Text(
-                    isUrdu ? "Booking Bhejain" : "Send Booking",
-                    style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.background),
+                  label: const Text(
+                    "Send Booking",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.background,
+                    ),
                   ),
                 ),
               ),
@@ -308,7 +229,54 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
     );
   }
 
-  Widget _bigButton({required IconData icon, required String label, required VoidCallback onTap}) {
+  Widget _topBar() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const SizedBox(width: 40),
+        Container(
+          width: 40,
+          height: 5,
+          decoration: BoxDecoration(
+            color: Colors.black26,
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.close, size: 28, color: Colors.black54),
+        ),
+      ],
+    );
+  }
+
+  Widget _heading() {
+    return Row(
+      children: [
+        Text(
+          widget.serviceType == 'between'
+              ? "Select Start & End Dates"
+              : "Select Your Availability Hours",
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryDark,
+          ),
+        ),
+        const Spacer(),
+        IconButton(
+          onPressed: () => setState(() => isUrdu = !isUrdu),
+          icon: const Icon(Icons.language, color: AppColors.primaryDark),
+        ),
+      ],
+    );
+  }
+
+  Widget _bigButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -325,7 +293,10 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             const Icon(Icons.arrow_drop_down, color: AppColors.primaryDark),

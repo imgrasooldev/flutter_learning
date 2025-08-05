@@ -104,7 +104,12 @@ class ProviderDetailPage extends StatelessWidget {
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 100), // Bottom padding for fixed button
+                  padding: const EdgeInsets.fromLTRB(
+                    20,
+                    20,
+                    20,
+                    100,
+                  ), // Bottom padding for fixed button
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -288,10 +293,11 @@ class ProviderDetailPage extends StatelessWidget {
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
-            builder: (context) => BookingBottomSheet(
-              providerName: name,
-              serviceType: 'between', // You can pass 'single' as needed.
-            ),
+            builder:
+                (context) => BookingBottomSheet(
+                  providerName: name,
+                  serviceType: 'between', // You can pass 'single' as needed.
+                ),
           );
         },
         icon: const Icon(Icons.send, color: AppColors.background),
