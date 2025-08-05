@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
 import '../../../theme/app_colors.dart';
 import '../../seeker/models/category_model.dart';
 
@@ -18,23 +20,87 @@ class _JobPostPageState extends State<JobPostPage> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
 
-  void _submitJob() {
-    if (_titleController.text.isEmpty ||
-        _descriptionController.text.isEmpty ||
-        _selectedCategory == null ||
-        _selectedDate == null ||
-        _selectedTime == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
-      return;
+  bool _isFormValid = false;
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController.addListener(_validateForm);
+    _descriptionController.addListener(_validateForm);
+  }
+
+  void _validateForm() {
+    final isValid =
+        _titleController.text.trim().length >= 5 &&
+        _descriptionController.text.trim().isNotEmpty &&
+        _selectedCategory != null &&
+        _selectedDate != null &&
+        _selectedTime != null;
+
+    if (_isFormValid != isValid) {
+      setState(() => _isFormValid = isValid);
     }
+  }
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Job posted successfully!')));
+  void _submitJob() async {
+    HapticFeedback.mediumImpact();
+    setState(() => _isSubmitting = true);
 
-    Navigator.pop(context);
+    await Future.delayed(const Duration(seconds: 2)); // simulate API call
+
+    if (!mounted) return;
+
+    setState(() => _isSubmitting = false);
+    showDialog(
+      context: context,
+      builder:
+          (_) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Lottie.asset(
+                    'assets/animations/success.json',
+                    width: 120,
+                    repeat: false,
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Job Posted Successfully!',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                        ..pop()
+                        ..pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      backgroundColor: AppColors.primary,
+                    ),
+                    child: const Text(
+                      'Close',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+    );
   }
 
   @override
@@ -53,53 +119,66 @@ class _JobPostPageState extends State<JobPostPage> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, viewInsets.bottom + 30),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _sectionDivider('Job Details'),
-            const SizedBox(height: 20),
-            _inputField(
-              controller: _titleController,
-              label: 'Job Title',
-              hint: 'Enter job title...',
-              icon: Icons.work_outline,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(20, 20, 20, viewInsets.bottom + 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _sectionDivider('Job Details'),
+                const SizedBox(height: 20),
+                _inputField(
+                  controller: _titleController,
+                  label: 'Job Title',
+                  hint: 'Enter job title...',
+                  icon: Icons.work_outline,
+                ),
+                const SizedBox(height: 18),
+                _inputField(
+                  controller: _descriptionController,
+                  label: 'Description',
+                  hint: 'Describe the job...',
+                  icon: Icons.description_outlined,
+                  maxLines: 4,
+                ),
+                const SizedBox(height: 30),
+                _sectionDivider('Category & Timing'),
+                const SizedBox(height: 20),
+                _categoryDropdown(),
+                const SizedBox(height: 18),
+                _selectableField(
+                  label: 'Select Date',
+                  value:
+                      _selectedDate != null
+                          ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
+                          : '',
+                  icon: Icons.calendar_today_outlined,
+                  onTap: _pickDate,
+                ),
+                const SizedBox(height: 18),
+                _selectableField(
+                  label: 'Select Time Slot',
+                  value:
+                      _selectedTime != null
+                          ? _selectedTime!.format(context)
+                          : '',
+                  icon: Icons.access_time,
+                  onTap: _pickTime,
+                ),
+                const SizedBox(height: 40),
+                _submitButton(),
+              ],
             ),
-            const SizedBox(height: 18),
-            _inputField(
-              controller: _descriptionController,
-              label: 'Description',
-              hint: 'Describe the job...',
-              icon: Icons.description_outlined,
-              maxLines: 4,
+          ),
+          if (_isSubmitting)
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: const Center(
+                child: CircularProgressIndicator(color: AppColors.primaryDark),
+              ),
             ),
-            const SizedBox(height: 30),
-            _sectionDivider('Category & Timing'),
-            const SizedBox(height: 20),
-            _categoryDropdown(),
-            const SizedBox(height: 18),
-            _selectableField(
-              label: 'Select Date',
-              value:
-                  _selectedDate != null
-                      ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
-                      : '',
-              icon: Icons.calendar_today_outlined,
-              onTap: _pickDate,
-            ),
-            const SizedBox(height: 18),
-            _selectableField(
-              label: 'Select Time Slot',
-              value:
-                  _selectedTime != null ? _selectedTime!.format(context) : '',
-              icon: Icons.access_time,
-              onTap: _pickTime,
-            ),
-            const SizedBox(height: 40),
-            _submitButton(),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -208,6 +287,7 @@ class _JobPostPageState extends State<JobPostPage> {
             }).toList(),
         onChanged: (value) {
           setState(() => _selectedCategory = value);
+          _validateForm();
         },
       ),
     );
@@ -259,31 +339,35 @@ class _JobPostPageState extends State<JobPostPage> {
 
   Widget _submitButton() {
     return GestureDetector(
-      onTap: _submitJob,
+      onTap: _isFormValid && !_isSubmitting ? _submitJob : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 18),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              AppColors.primary.withOpacity(0.9),
-              AppColors.primaryDark.withOpacity(0.85),
-            ],
+            colors:
+                _isFormValid
+                    ? [
+                      AppColors.primary.withOpacity(0.9),
+                      AppColors.primaryDark.withOpacity(0.85),
+                    ]
+                    : [Colors.grey.shade300, Colors.grey.shade400],
           ),
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 5),
-            ),
+            if (_isFormValid)
+              BoxShadow(
+                color: AppColors.primary.withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 5),
+              ),
           ],
         ),
-        child: const Center(
+        child: Center(
           child: Text(
             'Submit Job Request',
             style: TextStyle(
-              color: Colors.white,
+              color: _isFormValid ? Colors.white : Colors.grey.shade600,
               fontSize: 18,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
@@ -300,21 +384,10 @@ class _JobPostPageState extends State<JobPostPage> {
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryDark,
-              onPrimary: Colors.white,
-              onSurface: AppColors.textPrimary,
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
     if (pickedDate != null) {
       setState(() => _selectedDate = pickedDate);
+      _validateForm();
     }
   }
 
@@ -322,21 +395,10 @@ class _JobPostPageState extends State<JobPostPage> {
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryDark,
-              onPrimary: Colors.white,
-              onSurface: AppColors.textPrimary,
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
     if (pickedTime != null) {
       setState(() => _selectedTime = pickedTime);
+      _validateForm();
     }
   }
 }
