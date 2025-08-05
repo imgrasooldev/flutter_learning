@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_learning/features/provider/views/p_home_page.dart';
 import 'package:flutter_learning/features/seeker/bloc/category/category_bloc.dart';
 import 'package:flutter_learning/features/seeker/bloc/category/category_event.dart';
 import 'package:flutter_learning/features/seeker/bloc/category/category_state.dart';
@@ -10,8 +11,8 @@ import 'package:flutter_learning/features/seeker/views/components/popular_servic
 import 'package:flutter_learning/features/seeker/views/components/top_providers_list.dart';
 import 'package:flutter_learning/features/seeker/views/components/search_bar.dart';
 import 'package:flutter_learning/features/user/profile_page.dart';
+import 'package:flutter_learning/features/seeker/views/job_post_page.dart';
 import '../../../theme/app_colors.dart';
-import 'package:flutter_learning/features/seeker/views/components/cta_button.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -47,15 +48,14 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     context.read<CategoryBloc>().add(FetchCategories());
-
-    _fetchProviders(); // <-- Fetch first page
+    _fetchProviders();
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent - 200 &&
           !_isLoading &&
           _hasMore) {
-        _fetchProviders(); // <-- Fetch next page
+        _fetchProviders();
       }
     });
 
@@ -111,9 +111,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: AppColors.background,
       appBar: buildAppBar(context),
       body: GestureDetector(
-        onTap:
-            () =>
-                FocusScope.of(context).unfocus(), // <-- Dismiss Keyboard on Tap
+        onTap: () => FocusScope.of(context).unfocus(),
         child: BlocBuilder<CategoryBloc, CategoryState>(
           builder: (context, state) {
             if (state is CategoryLoading) {
@@ -202,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                   0,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
-                ); // <-- Auto Scroll to Top on Select
+                );
 
                 _fetchProviders(reset: true);
               },
@@ -225,13 +223,76 @@ class _HomePageState extends State<HomePage> {
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
                       AppColors.primary,
-                    ), // Loader Color Fixed
+                    ),
                   ),
                 ),
               ),
           ],
         ),
-        const Positioned(bottom: 16, left: 16, right: 16, child: CTAButton()),
+        Positioned(
+          bottom: 16,
+          left: 16,
+          right: 16,
+          child: Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Offer Your Service Navigation
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ProviderHomePage(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        4,
+                      ), // Very low border radius
+                    ),
+                    elevation: 6, // Optional subtle shadow
+                  ),
+                  child: const Text(
+                    'Offer Your Service',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Post Your Job Navigation
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => JobPostPage(categories: _allServices),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        4,
+                      ), // Very low border radius
+                    ),
+                    elevation: 6, // Optional subtle shadow
+                  ),
+                  child: const Text(
+                    'Post Your Job',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
