@@ -4,7 +4,7 @@ import 'package:flutter_learning/features/provider/views/p_home_page.dart';
 import 'package:flutter_learning/features/seeker/bloc/category/category_bloc.dart';
 import 'package:flutter_learning/features/seeker/bloc/category/category_event.dart';
 import 'package:flutter_learning/features/seeker/bloc/category/category_state.dart';
-import 'package:flutter_learning/features/seeker/models/category_model.dart';
+import 'package:flutter_learning/features/seeker/models/sub_category_model.dart';
 import 'package:flutter_learning/features/seeker/models/service_providers_model.dart';
 import 'package:flutter_learning/features/seeker/repo/service_providers_repository.dart';
 import 'package:flutter_learning/features/seeker/views/components/popular_services_grid.dart';
@@ -24,8 +24,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
 
-  List<CategoryModel> _allServices = [];
-  List<CategoryModel> _filteredServices = [];
+  List<SubCategoryModel> _allServices = [];
+  List<SubCategoryModel> _filteredServices = [];
   int? _selectedSubCategoryId;
 
   final List<Map<String, dynamic>> _popularServices = [
@@ -239,12 +239,21 @@ class _HomePageState extends State<HomePage> {
                 child: ElevatedButton(
                   onPressed: () {
                     // Offer Your Service Navigation
-                    Navigator.push(
+                   /*  Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => const ProviderHomePage(),
                       ),
-                    );
+                    ); */
+                    Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (_) => BlocProvider.value(
+      value: context.read<CategoryBloc>(),
+      child: const ProviderHomePage(),
+    ),
+  ),
+);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,

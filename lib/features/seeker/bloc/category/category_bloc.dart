@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_learning/features/seeker/bloc/category/category_event.dart';
 import 'package:flutter_learning/features/seeker/bloc/category/category_state.dart';
-import 'package:flutter_learning/features/seeker/models/category_model.dart';
-import 'package:flutter_learning/features/seeker/repo/category_repository.dart';
+import 'package:flutter_learning/features/seeker/models/sub_category_model.dart';
+import 'package:flutter_learning/features/seeker/repo/sub_category_repository.dart';
 
 class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
-  final CategoryRepository categoryRepository;
-  List<CategoryModel> _cachedCategories = [];
+  final SubCategoryRepository categoryRepository;
+  List<SubCategoryModel> _cachedCategories = [];
 
   CategoryBloc(this.categoryRepository) : super(CategoryInitial()) {
     on<FetchCategories>((event, emit) async {

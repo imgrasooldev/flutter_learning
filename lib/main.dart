@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_learning/features/seeker/bloc/category/category_bloc.dart';
 import 'package:flutter_learning/features/seeker/bloc/service_providers/service_provider_bloc.dart';
-import 'package:flutter_learning/features/seeker/repo/category_repository.dart';
+import 'package:flutter_learning/features/seeker/repo/sub_category_repository.dart';
 import 'package:flutter_learning/features/seeker/repo/service_providers_repository.dart';
 import 'package:flutter_learning/features/user/bloc/profile_bloc.dart';
 import 'package:flutter_learning/features/user/repo/profile_repository.dart';
@@ -23,8 +23,8 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AuthRepository>(create: (_) => AuthRepository()),
-        RepositoryProvider<CategoryRepository>(
-          create: (_) => CategoryRepository(),
+        RepositoryProvider<SubCategoryRepository>(
+          create: (_) => SubCategoryRepository(),
         ),
         RepositoryProvider<ServiceProviderRepository>(
           create: (_) => ServiceProviderRepository(),
@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create:
-                (context) => CategoryBloc(context.read<CategoryRepository>()),
+                (context) => CategoryBloc(context.read<SubCategoryRepository>()),
           ),
           BlocProvider<ServiceProviderBloc>(
             create:

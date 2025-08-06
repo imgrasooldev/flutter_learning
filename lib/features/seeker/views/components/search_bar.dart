@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../models/category_model.dart';
+import '../../models/sub_category_model.dart';
 import '../../../../theme/app_colors.dart';
 
 class SearchBarWidget extends StatefulWidget {
   final TextEditingController controller;
-  final List<CategoryModel> filteredServices;
-  final Function(CategoryModel) onSelect;
+  final List<SubCategoryModel> filteredServices;
+  final Function(SubCategoryModel) onSelect;
   final VoidCallback onClear;
 
   const SearchBarWidget({

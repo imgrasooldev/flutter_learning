@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
-import '../models/category_model.dart';
+import '../models/sub_category_model.dart';
 import '../../../services/api_services.dart';
 
-class CategoryRepository {
+class SubCategoryRepository {
   final ApiService _api = ApiService();
 
-  Future<List<CategoryModel>> fetchCategories() async {
+  Future<List<SubCategoryModel>> fetchCategories() async {
     try {
       final response = await _api.get(
         'categories/search-category-list-dropdown',
@@ -19,9 +19,9 @@ class CategoryRepository {
       }
 
       final List categoriesJson = response.data['data'];
-      // print('Fetched Categories JSON: $categoriesJson');
+      print('Fetched Categories JSON: $categoriesJson');
       return categoriesJson
-          .map((json) => CategoryModel.fromJson(json))
+          .map((json) => SubCategoryModel.fromJson(json))
           .toList();
     } on DioException catch (e) {
       final statusCode = e.response?.statusCode;

@@ -1,20 +1,20 @@
 import 'package:equatable/equatable.dart';
 
-class CategoryModel extends Equatable {
+class SubCategoryModel extends Equatable {
   final int id;
   final String name;
   final String type;
   final int parentId;
 
-  const CategoryModel({
+  const SubCategoryModel({
     required this.id,
     required this.name,
     required this.type,
     required this.parentId,
   });
 
-  factory CategoryModel.fromJson(Map<String, dynamic> json) {
-    return CategoryModel(
+  factory SubCategoryModel.fromJson(Map<String, dynamic> json) {
+    return SubCategoryModel(
       id: json['id'],
       name: json['name'],
       type: json['type'],

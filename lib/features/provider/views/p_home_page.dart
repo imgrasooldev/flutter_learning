@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../theme/app_colors.dart';
+import '../../seeker/bloc/category/category_bloc.dart';
+import '../../seeker/bloc/category/category_state.dart';
+import '../../seeker/bloc/category/category_event.dart';
+import '../../provider/views/p_add_service_page.dart';
 
 class ProviderHomePage extends StatelessWidget {
   const ProviderHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    context.read<CategoryBloc>().add(FetchCategories());
+
     final screenWidth = MediaQuery.of(context).size.width;
 
     final List<Map<String, dynamic>> recentRequests = [
@@ -35,8 +42,7 @@ class ProviderHomePage extends StatelessWidget {
             if (context.canPop()) {
               context.pop();
             } else {
-              // Optional: navigate to a default route if cannot pop
-              context.go('/home'); // or replace with your desired route
+              context.go('/home');
             }
           },
         ),
@@ -66,12 +72,25 @@ class ProviderHomePage extends StatelessWidget {
                   _serviceItem('Plumber', 'Pipe fix, bathroom fitting', false),
                   _serviceItem('Mechanic', 'Bike and car work', true),
                   const SizedBox(height: 16),
-                  _gradientButton(
-                    icon: Icons.add,
-                    label: "Add New Service",
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Add service clicked')),
+                  BlocBuilder<CategoryBloc, CategoryState>(
+                    builder: (context, state) {
+                      return _gradientButton(
+                        icon: Icons.add,
+                        label: "Add New Service",
+                        onPressed: () {
+                          if (state is CategoryLoaded) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => AddServicePage(subCategories: state.categories),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Categories not loaded yet')),
+                            );
+                          }
+                        },
                       );
                     },
                   ),
@@ -144,7 +163,7 @@ class ProviderHomePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withOpacity(0.1) , // Corrected withValues()
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),

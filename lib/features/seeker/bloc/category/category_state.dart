@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_learning/features/seeker/models/category_model.dart';
+import 'package:flutter_learning/features/seeker/models/sub_category_model.dart';
 
 abstract class CategoryState extends Equatable {
   const CategoryState();
@@ -13,7 +13,7 @@ class CategoryInitial extends CategoryState {}
 class CategoryLoading extends CategoryState {}
 
 class CategoryLoaded extends CategoryState {
-  final List<CategoryModel> categories;
+  final List<SubCategoryModel> categories;
 
   const CategoryLoaded(this.categories);
 

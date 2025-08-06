@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
-import '../../seeker/models/category_model.dart';
+import '../models/sub_category_model.dart';
 
 class JobPostPage extends StatefulWidget {
-  final List<CategoryModel> categories;
+  final List<SubCategoryModel> categories;
 
   const JobPostPage({super.key, required this.categories});
 
@@ -14,7 +14,7 @@ class JobPostPage extends StatefulWidget {
 class _JobPostPageState extends State<JobPostPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  CategoryModel? _selectedCategory;
+  SubCategoryModel? _selectedCategory;
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
 
@@ -183,7 +183,7 @@ class _JobPostPageState extends State<JobPostPage> {
           ),
         ],
       ),
-      child: DropdownButtonFormField<CategoryModel>(
+      child: DropdownButtonFormField<SubCategoryModel>(
         value: _selectedCategory,
         isExpanded: true,
         icon: const Icon(Icons.keyboard_arrow_down),
@@ -201,7 +201,7 @@ class _JobPostPageState extends State<JobPostPage> {
         ),
         items:
             widget.categories.map((cat) {
-              return DropdownMenuItem<CategoryModel>(
+              return DropdownMenuItem<SubCategoryModel>(
                 value: cat,
                 child: Text(cat.name, style: const TextStyle(fontSize: 16)),
               );
